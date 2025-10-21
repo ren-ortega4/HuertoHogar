@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema para API 31+ que hereda del tema nativo de SplashScreen -->
+    <style name="Theme.HuertoHogar.Launcher" parent="Theme.SplashScreen">
+        <!-- color de fondo del splash -->
+        <item name="android:windowSplashScreenBackground">@color/green</item>
+
+        <!-- duración (opcional) -->
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_huerto_launcher_foreground</item>
+
+        <!-- mantén fallback windowBackground por seguridad -->
+        <item name="postSplashScreenTheme">@style/Theme.HuertoHogar</item>
+    </style>
+</resources>
