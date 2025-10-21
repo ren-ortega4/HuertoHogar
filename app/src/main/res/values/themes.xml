@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.HuertoHogar" parent="android:Theme.Material.Light.NoActionBar">
+    </style>
+
+    <!-- Fallback launcher theme para < API 31 (usa windowBackground) -->
+    <style name="Theme.HuertoHogar.Launcher" parent="Theme.HuertoHogar">
+        <item name="android:windowBackground">@color/green</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+</resources>
