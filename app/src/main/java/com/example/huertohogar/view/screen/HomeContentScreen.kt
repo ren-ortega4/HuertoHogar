@@ -171,7 +171,8 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
 
     // Footer
     NavigationBar(
-        containerColor = Color(0xFFABABAB)
+        containerColor = Color(0xFFABABAB),
+        tonalElevation = 0.dp
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
