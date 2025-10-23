@@ -58,6 +58,8 @@ fun ProductsByCategoryScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
+
+
                 )
             }
             
@@ -84,7 +86,9 @@ fun CategorySection(
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 12.dp)
         )
         
         LazyRow(
@@ -108,16 +112,18 @@ fun ProductCard(
 ) {
     Card(
         modifier = Modifier
-            .width(160.dp)
+            .width(180.dp)
+            .padding(12.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Card(
