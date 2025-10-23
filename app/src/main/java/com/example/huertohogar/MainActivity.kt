@@ -20,6 +20,7 @@ import com.example.huertohogar.view.screen.BottomNavigationBar
 import com.example.huertohogar.view.screen.GreenAppBar
 import com.example.huertohogar.view.screen.HomeContentScreen
 import com.example.huertohogar.view.screen.NotificacionesScreen
+import com.example.huertohogar.view.screen.ProductsByCategoryScreen
 import com.example.huertohogar.view.screen.ProfileScreen
 import com.example.huertohogar.view.screen.Screen
 import com.example.huertohogar.viewmodel.NotificacionesViewModel
@@ -56,7 +57,9 @@ class MainActivity : ComponentActivity() {
                 ){ innerPadding ->
                     NavHost(navController = navController, startDestination = Screen.Home.route, modifier = Modifier.padding(innerPadding)) {
                         composable(Screen.Home.route) {
-                            HomeContentScreen()
+                            HomeContentScreen(
+                                onNavigateToProducts = { navController.navigate("ProductsScreen") }
+                            )
                         }
                         composable(Screen.Cart.route){
                             Text("Cart Screen (placeholder)")
@@ -68,6 +71,12 @@ class MainActivity : ComponentActivity() {
                             NotificacionesScreen(
                                 viewModel = notificacionesViewModel,
                                 onClose = { navController.popBackStack() }
+                            )
+                        }
+                        composable("ProductsScreen") {
+                            ProductsByCategoryScreen(
+                                onProductClick = { product ->
+                                }
                             )
                         }
                     }

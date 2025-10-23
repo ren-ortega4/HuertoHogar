@@ -38,7 +38,8 @@ import com.example.huertohogar.viewmodel.MainViewModel
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = viewModel()
+    mainViewModel: MainViewModel = viewModel(),
+    onNavigateToProducts: () -> Unit = {}
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
@@ -81,6 +82,20 @@ fun MainContent(
                     println("Producto clickeado: ${product.name}")
                 }
             )
+
+            Spacer(Modifier.height(16.dp))
+            androidx.compose.material3.Button(
+                onClick = onNavigateToProducts,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF388E3C)
+                )
+            ) {
+                androidx.compose.material3.Text(
+                    "Ver Todos los Productos por Categoría",
+                    color = Color.White
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
             Text("Categorías", color = Color(0xFF388E3C))

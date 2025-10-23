@@ -55,8 +55,14 @@ sealed class Screen(val route: String){
 
 
 @Composable
-fun HomeContentScreen(modifier: Modifier = Modifier) {
-    MainContent(modifier)
+fun HomeContentScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToProducts: () -> Unit = {}
+) {
+    MainContent(
+        modifier = modifier,
+        onNavigateToProducts = onNavigateToProducts
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
