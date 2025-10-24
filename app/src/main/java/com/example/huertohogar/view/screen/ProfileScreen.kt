@@ -32,10 +32,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel){
+fun ProfileScreen(viewModel: ProfileViewModel,navController: NavController){
     val context = LocalContext.current
     val imagenUri by viewModel.imagenUri.collectAsState(initial = null)
 
@@ -103,6 +106,29 @@ fun ProfileScreen(viewModel: ProfileViewModel){
             }) {
                 Text("Toma una foto con la cámara")
             }
+
+
+
+            Button(
+                onClick = {navController.navigate("InicioSesion")},
+                colors = ButtonDefaults.buttonColors(
+                    Color.Red,
+                    Color.White),
+                    modifier= Modifier.padding(vertical = 4.dp)
+
+            ) { Text("inicia  sesión")}
+
+
+
+
+
+            Button(
+                onClick = {navController.navigate("FormularioRegistro")},
+                colors = ButtonDefaults.buttonColors(
+                    Color.Green,
+                    Color.White),
+                modifier = Modifier .padding(vertical = 4.dp)
+            ) { Text("Registrate Acá!.")}
         }
     }
 }
