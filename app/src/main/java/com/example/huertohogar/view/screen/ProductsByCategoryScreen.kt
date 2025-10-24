@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,11 +32,13 @@ import com.example.huertohogar.R
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
 import com.example.huertohogar.repository.ProductRepository
+import com.example.huertohogar.viewmodel.CartViewModel
 
 
 @Composable
 fun ProductsByCategoryScreen(
     modifier: Modifier = Modifier,
+    cartViewModel: CartViewModel,
     onProductClick: (Product) -> Unit = {}
 ) {
     val categories = ProductRepository.getAllCategories()
@@ -79,6 +80,7 @@ fun ProductsByCategoryScreen(
                 CategorySection(
                     category = category,
                     products = ProductRepository.getProductsByCategory(category),
+                    cartViewModel = cartViewModel,
                     onProductClick = onProductClick
                 )
             }
@@ -90,6 +92,7 @@ fun ProductsByCategoryScreen(
 fun CategorySection(
     category: ProductCategory,
     products: List<Product>,
+    cartViewModel: CartViewModel,
     onProductClick: (Product) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -110,6 +113,7 @@ fun CategorySection(
             items(products) { product ->
                 ProductCard(
                     product = product,
+                    cartViewModel = cartViewModel,
                     onClick = { onProductClick(product) }
                 )
             }
@@ -120,6 +124,7 @@ fun CategorySection(
 @Composable
 fun ProductCard(
     product: Product,
+    cartViewModel: CartViewModel,
     onClick: () -> Unit
 ) {
     var quantity by remember { mutableIntStateOf(1) }
@@ -220,11 +225,11 @@ fun ProductCard(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Boton de añadir al carrito, falta el carrito
+            // Boton de añadir al carrito
             Button(
                 onClick = {
-                    // Aqui tiene que ir la logica del carrito
-                    println("Añadido al carrito: ${product.name} x $quantity")
+                    cartViewModel.addToCart(product, quantity)
+                    quantity = 1 // Resetear cantidad después de agregar
                 },
                 modifier = Modifier
                     .fillMaxWidth()

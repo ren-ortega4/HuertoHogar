@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -17,12 +16,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.huertohogar.ui.theme.HuertoHogarTheme
 import com.example.huertohogar.view.screen.BottomNavigationBar
+import com.example.huertohogar.view.screen.CartScreen
 import com.example.huertohogar.view.screen.GreenAppBar
 import com.example.huertohogar.view.screen.HomeContentScreen
 import com.example.huertohogar.view.screen.NotificacionesScreen
 import com.example.huertohogar.view.screen.ProductsByCategoryScreen
 import com.example.huertohogar.view.screen.ProfileScreen
 import com.example.huertohogar.view.screen.Screen
+import com.example.huertohogar.viewmodel.CartViewModel
 import com.example.huertohogar.viewmodel.NotificacionesViewModel
 import com.example.huertohogar.viewmodel.ProfileViewModel
 
@@ -38,11 +39,12 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val notificacionesViewModel: NotificacionesViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
+                val cartViewModel: CartViewModel = viewModel()
 
                 val notifs by notificacionesViewModel.notificaciones.collectAsState(initial = emptyList())
                 val notificacionesNoLeidas = notifs.count{ !it.leido}
-
-                var cartCount = 0
+                
+                val cartCount by cartViewModel.totalItems.collectAsState()
 
                 Scaffold (
                     topBar = {
@@ -62,7 +64,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Screen.Cart.route){
-                            Text("Cart Screen (placeholder)")
+                            CartScreen(viewModel = cartViewModel)
                         }
                         composable(Screen.Account.route){
                             ProfileScreen(viewModel = profileViewModel)
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("ProductsScreen") {
                             ProductsByCategoryScreen(
+                                cartViewModel = cartViewModel,
                                 onProductClick = { product ->
                                 }
                             )
