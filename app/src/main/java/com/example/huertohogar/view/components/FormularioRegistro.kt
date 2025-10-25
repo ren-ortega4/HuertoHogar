@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -62,7 +63,7 @@ fun FormScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Formulario de Registro") },
+                title = { Text("FORMULARIO DE REGISTRO") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -210,9 +211,11 @@ fun FormScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E8B57), // Color verde con código hexadecimal
                     contentColor = Color.White
-                )
+
+                ),
+                shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Registrar")
+                Text("REGISTRAR")
             }
         }
     }

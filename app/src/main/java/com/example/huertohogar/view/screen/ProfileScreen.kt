@@ -33,6 +33,7 @@ import java.util.Date
 import java.util.Locale
 import android.Manifest
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -123,9 +124,9 @@ fun ProfileScreen(viewModel: ProfileViewModel,navController: NavController){
                     colors = ButtonDefaults.buttonColors(
                         Color(0xFF2E8B57),
                         Color.White),
-                    modifier= Modifier.padding(vertical = 10.dp),
+                    modifier= Modifier.padding(vertical = 10.dp)
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp)
-
 
                 ) { Text("INICIAR SESIÓN")}
 
