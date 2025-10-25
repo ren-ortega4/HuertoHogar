@@ -33,16 +33,20 @@ import com.example.huertohogar.view.components.FeaturedProductsRow
 import com.example.huertohogar.view.components.TipCard
 import com.example.huertohogar.view.components.WelcomeCard
 import com.example.huertohogar.viewmodel.MainViewModel
+import com.example.huertohogar.viewmodel.TipViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    mainViewModel: MainViewModel = viewModel()
+    mainViewModel: MainViewModel = viewModel(),
+    tipViewModel: TipViewModel = viewModel()
 ) {
     val uiState by mainViewModel.uiState.collectAsState()
 
     val isDark = isSystemInDarkTheme()
+
+    val currentTip by tipViewModel.currentTip.collectAsState()
 
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -68,7 +72,10 @@ fun MainContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             WelcomeCard(modifier = Modifier.padding(bottom = 16.dp))
-            TipCard("🌱 Tip del día: Riega tus plantas temprano para conservar humedad.", modifier = Modifier.padding(bottom = 20.dp))
+            TipCard(
+                tip = currentTip,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
 
 
             Spacer(Modifier.height(18.dp))
