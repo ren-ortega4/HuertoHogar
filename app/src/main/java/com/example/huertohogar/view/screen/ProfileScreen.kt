@@ -32,11 +32,24 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel,navController: NavController){
     val context = LocalContext.current
@@ -75,60 +88,72 @@ fun ProfileScreen(viewModel: ProfileViewModel,navController: NavController){
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ){
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            ImagenInteligente(imagenUri)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("PERFIL DE USUARIO") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF2E8B57),
+                    titleContentColor = Color.White
+                )
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+             Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ){
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                ImagenInteligente(imagenUri)
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = {pickImageLauncher.launch("image/*")}){
-                Text("Selecciona tu imagen desde galería")
-            }
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = {navController.navigate("InicioSesion")},
+                    colors = ButtonDefaults.buttonColors(
+                        Color(0xFF2E8B57),
+                        Color.White),
+                    modifier= Modifier.padding(vertical = 10.dp),
+                    shape = RoundedCornerShape(10.dp)
 
-            Button(onClick = {
-                when(PackageManager.PERMISSION_GRANTED){
-                    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                        val uri = createImageUri(context)
-                        cameraUri = uri
-                        takePictureLauncher.launch(uri)
-                    }
-                    else -> {
-                        requestCameraPermission.launch(Manifest.permission.CAMERA)
-                    }
+
+                ) { Text("INICIAR SESIÓN")}
+
+
+                TextButton(
+                    onClick = {navController.navigate("FormularioRegistro")}
+                ) {
+                    Text(
+                        buildAnnotatedString {
+                            append("Si NO TIENES CUENTA, ")
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2E8B57)
+                                )
+                            ) {
+                                append("REGISTRATE AQUI")
+                            }
+                        }
+                    )
                 }
-            }) {
-                Text("Toma una foto con la cámara")
             }
-
-
-
-            Button(
-                onClick = {navController.navigate("InicioSesion")},
-                colors = ButtonDefaults.buttonColors(
-                    Color.Red,
-                    Color.White),
-                    modifier= Modifier.padding(vertical = 4.dp)
-
-            ) { Text("inicia  sesión")}
-
-
-
-
-
-            Button(
-                onClick = {navController.navigate("FormularioRegistro")},
-                colors = ButtonDefaults.buttonColors(
-                    Color.Green,
-                    Color.White),
-                modifier = Modifier .padding(vertical = 4.dp)
-            ) { Text("Registrate Acá!.")}
+            }
         }
     }
 }
+
+
+
+
+

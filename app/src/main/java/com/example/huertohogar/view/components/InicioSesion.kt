@@ -51,7 +51,7 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF2E8B57),
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
@@ -118,18 +118,6 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                 Text("recordar usuario")
             }
 
-            // para boton de registro si no tengo cuenta esto me lleva al formulario de registro
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = {
-                    viewModel.limpiarFormulario()
-                    navController.navigate("formScreen")
-                }) {
-                    Text("¿No tienes cuenta? Regístrate aquí")
-                }
-            }
 
 
             // boton de inicio de sesion por defecto me esta llevando a al pantalla pricipal

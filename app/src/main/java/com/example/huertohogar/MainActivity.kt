@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        if (currentRoute != "FormularioRegistro" && currentRoute != Screen.Account.route) { // Oculta la barra en el formulario y en la cuenta
+                        if (currentRoute != "FormularioRegistro" && currentRoute != Screen.Account.route && currentRoute != "InicioSesion") { // Oculta la barra en el formulario, cuenta e inicio de sesión
                             GreenAppBar(
                                 notificacionesNoLeidas = notificacionesNoLeidas,
                                 onNotificaionesClick = { navController.navigate("NotificacionesScreen") }
@@ -62,15 +62,21 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     bottomBar = {
-                        if (currentRoute != "FormularioRegistro") { // Oculta la barra inferior solo en el formulario
+                        if (currentRoute != "FormularioRegistro" && currentRoute != "InicioSesion") { // Oculta la barra inferior solo en el formulario y en inicio de sesion
                             BottomNavigationBar(navController = navController, cartCount = cartCount)
                         }
                     }
                 ) { innerPadding ->
+                    val navHostModifier = if (currentRoute != Screen.Account.route && currentRoute != "InicioSesion" && currentRoute != "FormularioRegistro") {
+                        Modifier.padding(innerPadding)
+                    } else {
+                        Modifier
+                    }
+
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Home.route,
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = navHostModifier
                     ) {
                         composable(Screen.Home.route) {
                             HomeContentScreen()
