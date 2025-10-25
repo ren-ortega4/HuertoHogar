@@ -5,12 +5,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huertohogar.data.Tip
 import com.example.huertohogar.data.TipDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 
 class TipViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -21,28 +24,30 @@ class TipViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            val tips = tipDao.getAllTips().first()
-            if (tips.isEmpty()){
-                tipDao.insertAll(
-                    listOf(
-                        Tip(
-                            iconName = "LocalOffer",
-                            title = "Ofertas Especiales",
-                            text = "Descubre descuentos únicos para tí."),
-                        Tip(
-                            iconName = "ThumbUp",
-                            title = "",
-                            text = "Los mejores consejos para crear un huerto en tu hogar."),
-                        Tip(
-                            iconName = "Storefront",
-                            title = "",
-                            text = "Productos frescos y orgánicos a tu alcance."),
-                        Tip(
-                            iconName = "Call",
-                            title = "",
-                            text = "Tu opinión nos importa. ¡Contactános!")
+            withContext(Dispatchers.IO){
+                val tips = tipDao.getAllTips().first()
+                if (tips.isEmpty()){
+                    tipDao.insertAll(
+                        listOf(
+                            Tip(
+                                iconName = "LocalOffer",
+                                title = "Ofertas Especiales",
+                                text = "Descubre descuentos únicos para tí."),
+                            Tip(
+                                iconName = "ThumbUp",
+                                title = "Consejos",
+                                text = "Los mejores consejos para crear un huerto en tu hogar."),
+                            Tip(
+                                iconName = "Storefront",
+                                title = "Tienda",
+                                text = "Productos frescos y orgánicos a tu alcance."),
+                            Tip(
+                                iconName = "Call",
+                                title = "Comunidad",
+                                text = "Tu opinión nos importa. ¡Contactános!")
+                        )
                     )
-                )
+                }
             }
             startTipRotation()
         }

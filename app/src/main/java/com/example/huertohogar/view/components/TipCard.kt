@@ -1,13 +1,12 @@
 package com.example.huertohogar.view.components
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -37,18 +36,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.util.wrapMappedColumns
 import com.example.huertohogar.data.Tip
 import com.example.huertohogar.viewmodel.TipViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
 fun getIconForName(iconName: String): ImageVector{
@@ -66,20 +67,30 @@ fun getIconForName(iconName: String): ImageVector{
 @Composable
 fun TipCard(tip: Tip, modifier: Modifier = Modifier) {
 
-    val progressAnimationDuration = (TipViewModel.TIP_ROTATION_DELAY_MS - 500).toInt()
+    val progressAnimationDuration = (TipViewModel.TIP_ROTATION_DELAY_MS - 200).toInt()
 
-    var progress by remember { mutableFloatStateOf(0f) }
+    var animating by remember() { mutableFloatStateOf(0f) }
 
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(durationMillis = 9500, easing = LinearEasing)
-    )
 
     LaunchedEffect(key1 = tip.id) {
-        progress = 0f
-        delay(100)
-        progress = 1f
+        withContext(AndroidUiDispatcher.Main){
+            animating = 0f
+
+            delay(50)
+
+            animating = 1f
+        }
     }
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = animating,
+        animationSpec = if (animating == 1f){
+            tween(durationMillis = progressAnimationDuration, easing = LinearEasing)
+        } else {
+            tween(durationMillis = 0)
+        },
+        label = "ProgressAnimation"
+    )
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF388E3C)),
@@ -96,7 +107,8 @@ fun TipCard(tip: Tip, modifier: Modifier = Modifier) {
                 label = "AnimatedTipText",
                 transitionSpec = {
                     fadeIn(animationSpec = tween(600)) togetherWith
-                            fadeOut(animationSpec = tween(600))
+                    fadeOut(animationSpec = tween(600)) using
+                            SizeTransform(clip = false, sizeAnimationSpec = {_, _ -> tween(0)})
                 }
             ) { targetTip ->
                 Row(
@@ -129,7 +141,7 @@ fun TipCard(tip: Tip, modifier: Modifier = Modifier) {
             }
             Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator(
-                progress = {animatedProgress},
+                progress = { animatedProgress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(3.dp),
