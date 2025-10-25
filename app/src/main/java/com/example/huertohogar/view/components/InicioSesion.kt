@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.huertohogar.view.screen.Screen // Importar Screen
 import com.example.huertohogar.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,12 +81,12 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
             )
             // Formulario de correo
             OutlinedTextField(
-                value = estado.correo,
-                onValueChange = viewModel::onCorreoChange,
+                value = estado.loginCorreo, // Usar el campo de login
+                onValueChange = viewModel::onLoginCorreoChange, // Usar la función de login
                 label = { Text("Correo") },
-                isError = estado.errores.correo != null,
+                isError = estado.errores.errorLoginCorreo != null, // Usar el error de login
                 supportingText = {
-                    estado.errores.correo?.let {
+                    estado.errores.errorLoginCorreo?.let {
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
@@ -94,13 +95,13 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
 
             // Formulario de clave
             OutlinedTextField(
-                value = estado.clave,
-                onValueChange = viewModel::onClaveChange,
+                value = estado.loginClave, // Usar el campo de login
+                onValueChange = viewModel::onLoginClaveChange, // Usar la función de login
                 label = { Text("Clave") },
                 visualTransformation = PasswordVisualTransformation(),
-                isError = estado.errores.clave != null,
+                isError = estado.errores.errorLoginClave != null, // Usar el error de login
                 supportingText = {
-                    estado.errores.clave?.let {
+                    estado.errores.errorLoginClave?.let {
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
@@ -124,7 +125,7 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
             Button(
                 onClick = {
                     if (viewModel.validarLogin()) {
-                        navController.navigate("homeScreen") // Navega a la pantalla de inicio si la validación es exitosa
+                        navController.navigate(Screen.Home.route) // Navega a la pantalla de inicio si la validación es exitosa
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

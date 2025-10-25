@@ -194,7 +194,7 @@ fun FormScreen(
             }
             Button(
                 onClick = {
-                    if (viewModel.Validarformulario()) {
+                    if (viewModel.validarFormularioRegistro()) {
                         navController.navigate("resumen")
                     }
                 },

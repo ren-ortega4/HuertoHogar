@@ -38,6 +38,7 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
         "Magallanes y de la Antártica Chilena"
     )
 
+    // Funciones para el formulario de Registro
     fun onNombreChange (valor : String) {
         _estado.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
     }
@@ -61,57 +62,63 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
         _estado.update { it.copy(region = valor, errores = it.errores.copy(region = null)) }
     }
 
+    fun onAceptarTerminosChange(valor : Boolean) {
+        _estado.update { it.copy(aceptaTerminos = valor) }
+    }
+
+    // Funciones para el formulario de Login
+    fun onLoginCorreoChange(valor: String) {
+        _estado.update { it.copy(loginCorreo = valor, errores = it.errores.copy(errorLoginCorreo = null)) }
+    }
+
+    fun onLoginClaveChange(valor: String) {
+        _estado.update { it.copy(loginClave = valor, errores = it.errores.copy(errorLoginClave = null)) }
+    }
+
+    // Función común
     fun onRecordarUsuarioChange(valor:Boolean) {
         // Actualiza el estado y guarda la preferencia
         _estado.update { it.copy(recordarUsuario = valor) }
         appPreference.saveRememberUser(valor)
     }
 
-
-    fun onAceptarTerminosChange(valor : Boolean) {
-        _estado.update { it.copy(aceptaTerminos = valor) }
-    }
-
     fun limpiarFormulario() {
         _estado.value = UserUiState(recordarUsuario = _estado.value.recordarUsuario)
     }
 
-
-
-    fun Validarformulario(): Boolean{
+    fun validarFormularioRegistro(): Boolean{
         val estadoActual=_estado.value
-        val errores = UserError(
+        val erroresNuevos = estadoActual.errores.copy(
             nombre = if (estadoActual.nombre.isBlank())"El nombre es requerido" else null,
             correo = if (estadoActual.correo.isBlank())"El correo es requerido" else null,
             clave = if (estadoActual.clave.isBlank())"La clave es requerida" else null,
             confirmarClave = if (estadoActual.confirmarClave.isBlank()) "Confirme la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,
             direccion = if (estadoActual.direccion.isBlank())"La direccion es requerida" else null,
             region = if(estadoActual.region.isBlank())"la region es requerida" else null
-
         )
         val hayErrores= listOfNotNull(
-            errores.nombre,
-            errores.correo,
-            errores.clave,
-            errores.confirmarClave,
-            errores.direccion,
-            errores.region
+            erroresNuevos.nombre,
+            erroresNuevos.correo,
+            erroresNuevos.clave,
+            erroresNuevos.confirmarClave,
+            erroresNuevos.direccion,
+            erroresNuevos.region
         ).isNotEmpty()
-        _estado.update { it.copy(errores=errores) }
+        _estado.update { it.copy(errores=erroresNuevos) }
         return !hayErrores
     }
 
     fun validarLogin(): Boolean {
         val estadoActual = _estado.value
-        val errores = UserError(
-            correo = if (estadoActual.correo.isBlank()) "El correo es requerido" else null,
-            clave = if (estadoActual.clave.isBlank()) "La clave es requerida" else null
+        val erroresNuevos = estadoActual.errores.copy(
+            errorLoginCorreo = if (estadoActual.loginCorreo.isBlank()) "El correo es requerido" else null,
+            errorLoginClave = if (estadoActual.loginClave.isBlank()) "La clave es requerida" else null
         )
         val hayErrores = listOfNotNull(
-            errores.correo,
-            errores.clave
+            erroresNuevos.errorLoginCorreo,
+            erroresNuevos.errorLoginClave
         ).isNotEmpty()
-        _estado.update { it.copy(errores = errores) }
+        _estado.update { it.copy(errores = erroresNuevos) }
         return !hayErrores
     }
 
