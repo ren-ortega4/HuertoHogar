@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,13 @@ fun FormScreen(
 ){
     val estado by  viewModel.estado.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    // esto es para que se limpie el formulario una vez que se sale de la pantalla de registro o inicio de sesion
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.limpiarFormulario()
+        }
+    }
 
     Scaffold(
         topBar = {

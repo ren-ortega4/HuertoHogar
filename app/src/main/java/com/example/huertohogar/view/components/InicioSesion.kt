@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,12 @@ import com.example.huertohogar.viewmodel.UserViewModel
 @Composable
 fun InicioSesion(navController: NavController,viewModel : UserViewModel){
     val estado by viewModel.estado.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.limpiarFormulario()
+        }
+    }
 
     Scaffold (
         topBar = {
