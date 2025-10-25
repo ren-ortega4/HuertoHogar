@@ -38,7 +38,7 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
         "Magallanes y de la Antártica Chilena"
     )
 
-    // Funciones para el formulario de Registro
+    //<editor-fold desc="Funciones para el formulario de Registro">
     fun onNombreChange (valor : String) {
         _estado.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
     }
@@ -65,8 +65,9 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
     fun onAceptarTerminosChange(valor : Boolean) {
         _estado.update { it.copy(aceptaTerminos = valor) }
     }
+    //</editor-fold>
 
-    // Funciones para el formulario de Login
+    //<editor-fold desc="Funciones para el formulario de Login">
     fun onLoginCorreoChange(valor: String) {
         _estado.update { it.copy(loginCorreo = valor, errores = it.errores.copy(errorLoginCorreo = null)) }
     }
@@ -74,6 +75,29 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
     fun onLoginClaveChange(valor: String) {
         _estado.update { it.copy(loginClave = valor, errores = it.errores.copy(errorLoginClave = null)) }
     }
+    //</editor-fold>
+
+    //<editor-fold desc="Funciones de Sesión">
+    fun login() {
+        _estado.update {
+            // En una app real, aquí validarías las credenciales.
+            // Aquí simulamos un inicio de sesión exitoso.
+            it.copy(
+                isLoggedIn = true,
+                nombre = "Ángel Prado", // Simulado
+                correo = it.loginCorreo, // Usamos el correo del login
+                loginCorreo = "", // Limpiamos el formulario de login
+                loginClave = ""
+            )
+        }
+    }
+
+    fun logout() {
+        // Al cerrar sesión, reseteamos el estado completamente,
+        // excepto la preferencia de "recordar usuario".
+        _estado.value = UserUiState(recordarUsuario = _estado.value.recordarUsuario)
+    }
+    //</editor-fold>
 
     // Función común
     fun onRecordarUsuarioChange(valor:Boolean) {
@@ -83,13 +107,29 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
     }
 
     fun limpiarFormulario() {
-        _estado.value = UserUiState(recordarUsuario = _estado.value.recordarUsuario)
+        // Esta función ahora limpia SOLO los campos de los formularios,
+        // sin afectar el estado de la sesión (isLoggedIn).
+        _estado.update {
+            it.copy(
+                // Limpia campos de registro (dejando los datos de sesión si existen)
+                clave = "",
+                confirmarClave = "",
+                direccion = "",
+                region = "",
+                aceptaTerminos = false,
+                // Limpia campos de login
+                loginCorreo = "",
+                loginClave = "",
+                // Limpia todos los errores
+                errores = UserError()
+            )
+        }
     }
 
     fun validarFormularioRegistro(): Boolean{
         val estadoActual=_estado.value
         val erroresNuevos = estadoActual.errores.copy(
-            nombre = if (estadoActual.nombre.isBlank())"El nombre es requerido" else null,
+            nombre = if (estadoActual.nombre.isBlank()) "El nombre es requerido" else null,
             correo = if (estadoActual.correo.isBlank())"El correo es requerido" else null,
             clave = if (estadoActual.clave.isBlank())"La clave es requerida" else null,
             confirmarClave = if (estadoActual.confirmarClave.isBlank()) "Confirme la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,

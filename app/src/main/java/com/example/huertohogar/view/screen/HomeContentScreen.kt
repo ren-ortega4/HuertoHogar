@@ -174,7 +174,9 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
 
     // Footer
     NavigationBar(
-        containerColor = Color(0xFFABABAB)
+        modifier = Modifier.fillMaxWidth()
+            .height(85.dp),
+        containerColor = Color(0xFF2E8B57)
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
@@ -191,7 +193,7 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                 }
             },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF388E3C)
+                selectedIconColor = Color(0xFF2E8B57)
             )
         )
         NavigationBarItem(
@@ -211,7 +213,9 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                         }
                     }
                 }
-            }
+            }, colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF2E8B57)
+            )
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Cuenta") },
@@ -226,8 +230,9 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                         }
                     }
                 }
-            }
+            }, colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF2E8B57)
+            )
         )
     }
 }
-

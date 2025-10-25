@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -54,7 +53,7 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
     Scaffold (
         topBar = {
             CenterAlignedTopAppBar(
-                title = {Text("INICIO DE SESIÓN")},
+                title = {Text("Inicio de Sesión")},
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -124,7 +123,7 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                     checked = estado.recordarUsuario,
                     onCheckedChange =viewModel::onRecordarUsuarioChange
                 )
-                Text("RECORDAR USUARIO")
+                Text("recordar usuario")
             }
 
 
@@ -133,17 +132,19 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
             Button(
                 onClick = {
                     if (viewModel.validarLogin()) {
-                        navController.navigate(Screen.Home.route) // Navega a la pantalla de inicio si la validación es exitosa
+                        viewModel.login() // <-- ¡AQUÍ ESTÁ EL CAMBIO!
+                        navController.navigate(Screen.Account.route) { // Navega a la pantalla de Perfil
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E8B57),
                     contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(10.dp)
+                )
             ) {
-                Text("INGRESAR")
+                Text("Ingresar")
             }
         }
     }

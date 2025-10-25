@@ -85,7 +85,11 @@ class MainActivity : ComponentActivity() {
                             Text("Cart Screen (placeholder)")
                         }
                         composable(Screen.Account.route) {
-                            ProfileScreen(navController = navController, viewModel = profileViewModel)
+                            ProfileScreen(
+                                viewModel = userViewModel,
+                                profileViewModel = profileViewModel,
+                                navController = navController
+                            )
                         }
                         composable("NotificacionesScreen") {
                             NotificacionesScreen(

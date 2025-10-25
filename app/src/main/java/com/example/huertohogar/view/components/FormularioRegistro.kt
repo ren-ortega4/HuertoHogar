@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -196,15 +197,24 @@ fun FormScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = estado.aceptaTerminos,
-                    onCheckedChange = viewModel::onAceptarTerminosChange
+                    onCheckedChange = viewModel::onAceptarTerminosChange,
+                    colors = CheckboxDefaults.colors(
+
+                        checkedColor = Color(0xFF2E8B57), // Color verde con código hexadecimal
+                        uncheckedColor = Color.Gray
+                    )
+
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Acepto terminos y condiciones")
+                Text("Acepto terminos y condiciones",color = Color(0xFF2E8B57))
             }
             Button(
                 onClick = {
                     if (viewModel.validarFormularioRegistro()) {
-                        navController.navigate("resumen")
+                        navController.navigate("InicioSesion") {
+                            // Limpia la pantalla de registro del historial de navegación
+                            popUpTo("FormularioRegistro") { inclusive = true }
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
