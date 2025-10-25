@@ -1,4 +1,4 @@
-package com.example.huertohogar.model
+package com.example.huertohogar.viewmodel
 
 data class UserUiState(
     // Estado de Registro
@@ -20,5 +20,4 @@ data class UserUiState(
     // Estado Común
     val recordarUsuario: Boolean = false,
     val errores : UserError = UserError()
-) {
-}
+)

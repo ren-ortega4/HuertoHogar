@@ -118,13 +118,7 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
             Row (
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                Checkbox(
-                    checked = estado.recordarUsuario,
-                    onCheckedChange =viewModel::onRecordarUsuarioChange
-                )
-                Text("recordar usuario")
-            }
+            ){}
 
 
 

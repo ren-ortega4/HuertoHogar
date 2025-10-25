@@ -1,23 +1,20 @@
 package com.example.huertohogar.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.huertohogar.data.AppPreference
-import com.example.huertohogar.model.UserError
-import com.example.huertohogar.model.UserUiState
+import androidx.lifecycle.viewModelScope
+import com.example.huertohogar.model.Usuario
+import com.example.huertohogar.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
-class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
+class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
     private val _estado = MutableStateFlow(UserUiState())
     val estado : StateFlow<UserUiState> = _estado
 
-    init {
-        // al iniciar el viewmodel, lee el valor gaurdado y actualiza el estado
-        val rememberUser = appPreference.getRememberUser()
-        _estado.update { it.copy(recordarUsuario = rememberUser) }
-    }
+
 
     val regiones = listOf(
         "Arica y Parinacota",
@@ -100,11 +97,7 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
     //</editor-fold>
 
     // Función común
-    fun onRecordarUsuarioChange(valor:Boolean) {
-        // Actualiza el estado y guarda la preferencia
-        _estado.update { it.copy(recordarUsuario = valor) }
-        appPreference.saveRememberUser(valor)
-    }
+
 
     fun limpiarFormulario() {
         // Esta función ahora limpia SOLO los campos de los formularios,
@@ -130,7 +123,7 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
         val estadoActual=_estado.value
         val erroresNuevos = estadoActual.errores.copy(
             nombre = if (estadoActual.nombre.isBlank()) "El nombre es requerido" else null,
-            correo = if (estadoActual.correo.isBlank())"El correo es requerido" else null,
+            correo = if (estadoActual.correo.contains("@"))"@ en el correo es requerida " else null,
             clave = if (estadoActual.clave.isBlank())"La clave es requerida" else null,
             confirmarClave = if (estadoActual.confirmarClave.isBlank()) "Confirme la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,
             direccion = if (estadoActual.direccion.isBlank())"La direccion es requerida" else null,
@@ -160,6 +153,24 @@ class UserViewModel(private val appPreference: AppPreference) : ViewModel(){
         ).isNotEmpty()
         _estado.update { it.copy(errores = erroresNuevos) }
         return !hayErrores
+    }
+
+    fun guardarUsuario(){
+        val estadoActual = _estado.value
+        if (validarFormularioRegistro()) {
+            viewModelScope.launch {
+                val nuevoUsuario= Usuario(
+                    nombre = estadoActual.nombre,
+                    correo = estadoActual.correo,
+                    clave = estadoActual.confirmarClave,
+                    confirmarClave = estadoActual.confirmarClave,
+                    direccion = estadoActual.direccion,
+                    region = estadoActual.region,
+                    aceptaTerminos = estadoActual.aceptaTerminos
+                )
+                repository.insertar(nuevoUsuario)
+            }
+        }
     }
 
 }

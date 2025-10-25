@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.kapt")
+
 }
 
 android {
@@ -48,7 +50,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation("androidx.compose.material3:material3:1.2.0")
-    implementation(libs.androidx.room.ktx)
     implementation(libs.protolite.well.known.types)
     implementation(libs.litert)
     testImplementation(libs.junit)
@@ -64,6 +65,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1")
+    implementation ("androidx.room:room-ktx:2.6.1")
+
 }
 
 

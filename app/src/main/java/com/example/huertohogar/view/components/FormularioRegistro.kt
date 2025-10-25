@@ -211,6 +211,7 @@ fun FormScreen(
             Button(
                 onClick = {
                     if (viewModel.validarFormularioRegistro()) {
+                        viewModel.guardarUsuario()
                         navController.navigate("InicioSesion") {
                             // Limpia la pantalla de registro del historial de navegación
                             popUpTo("FormularioRegistro") { inclusive = true }

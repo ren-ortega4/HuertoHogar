@@ -1,7 +1,7 @@
 package com.example.huertohogar.repository
 
 import android.net.Uri
-import com.example.huertohogar.model.UserProfile
+import com.example.huertohogar.viewmodel.UserProfile
 
 class ProfileRepository {
     private var ProfileActual = UserProfile(

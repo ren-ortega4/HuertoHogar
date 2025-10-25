@@ -1,4 +1,4 @@
-package com.example.huertohogar.model
+package com.example.huertohogar.viewmodel
 
 import android.net.Uri
 
