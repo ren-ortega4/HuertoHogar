@@ -34,6 +34,7 @@ import com.example.huertohogar.view.components.TipCard
 import com.example.huertohogar.view.components.WelcomeCard
 import com.example.huertohogar.viewmodel.MainViewModel
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(

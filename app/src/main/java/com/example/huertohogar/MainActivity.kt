@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route, modifier = Modifier.padding(innerPadding)) {
                         composable(Screen.Home.route) {
                             HomeContentScreen(
-                                onNavigateToProducts = { navController.navigate("ProductsScreen") }
+                                onNavigateToProducts = { navController.navigate(Screen.Product.route) }
                             )
                         }
                         composable(Screen.Cart.route){
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                                 onClose = { navController.popBackStack() }
                             )
                         }
-                        composable("ProductsScreen") {
+                        composable(Screen.Product.route) {
                             ProductsByCategoryScreen(
                                 cartViewModel = cartViewModel,
                                 onProductClick = { product ->

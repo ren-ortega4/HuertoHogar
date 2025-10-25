@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -51,6 +52,9 @@ sealed class Screen(val route: String){
     object Home: Screen("home")
     object Cart: Screen("cart")
     object Account: Screen("account")
+
+    object Product: Screen("product")
+
 }
 
 
@@ -193,6 +197,26 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                 selectedIconColor = Color(0xFF388E3C)
             )
         )
+
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Menu, contentDescription = "Productos") },
+            selected = currentRoute == Screen.Product.route,
+            onClick = {
+                if (currentRoute != Screen.Product.route){
+                    navController.navigate(Screen.Product.route){
+                        launchSingleTop = true
+                        restoreState = true
+                        startDestinationId?.let {
+                                id -> popUpTo(id) {saveState = true}
+                        }
+                    }
+                }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
+        )
+
         NavigationBarItem(
             icon = {
                 BadgedBox(badge = { Badge { Text("$cartCount") } }) {
