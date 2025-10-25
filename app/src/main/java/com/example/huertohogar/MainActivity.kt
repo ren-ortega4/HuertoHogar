@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -60,7 +61,15 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route, modifier = Modifier.padding(innerPadding)) {
                         composable(Screen.Home.route) {
                             HomeContentScreen(
-                                onNavigateToProducts = { navController.navigate(Screen.Product.route) }
+                                onNavigateToProducts = { 
+                                    navController.navigate(Screen.Product.route) {
+                                        launchSingleTop = true
+                                        restoreState = true
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                    }
+                                }
                             )
                         }
                         composable(Screen.Cart.route){
