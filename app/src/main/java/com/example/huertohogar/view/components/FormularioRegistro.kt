@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -98,7 +99,12 @@ fun FormScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF2E8B57),
+                    unfocusedTextColor = Color(0xFF2E8B57),
+                    errorTextColor = Color(0xFF2E8B57)
+                )
             )
 
             // formulario de correo
@@ -112,7 +118,13 @@ fun FormScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF2E8B57),
+                    unfocusedTextColor = Color(0xFF2E8B57),
+                    errorTextColor = Color(0xFF2E8B57)
+                )
+
             )
             // formulario de clave
             OutlinedTextField(
@@ -126,7 +138,12 @@ fun FormScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF2E8B57),
+                    unfocusedTextColor = Color(0xFF2E8B57),
+                    errorTextColor = Color(0xFF2E8B57)
+                )
             )
             // formulario de clave confirmar
             OutlinedTextField(
@@ -140,7 +157,12 @@ fun FormScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF2E8B57),
+                    unfocusedTextColor = Color(0xFF2E8B57),
+                    errorTextColor = Color(0xFF2E8B57)
+                )
             )
 
             // formulario de direccion
@@ -154,7 +176,13 @@ fun FormScreen(
                         Text(it, color = MaterialTheme.colorScheme.error)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF2E8B57),
+                    unfocusedTextColor = Color(0xFF2E8B57),
+                    errorTextColor = Color(0xFF2E8B57)
+
+                )
             )
             // seleccionar region
             ExposedDropdownMenuBox(
@@ -175,8 +203,14 @@ fun FormScreen(
                         estado.errores.region?.let {
                             Text(it, color = MaterialTheme.colorScheme.error)
                         }
-                    }
+                    }, colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF2E8B57),
+                        unfocusedTextColor = Color(0xFF2E8B57),
+                        errorTextColor = Color(0xFF2E8B57)
+
+                    )
                 )
+
                 ExposedDropdownMenu(
                     expanded = isDropdownExpanded,
                     onDismissRequest = { isDropdownExpanded = false }
