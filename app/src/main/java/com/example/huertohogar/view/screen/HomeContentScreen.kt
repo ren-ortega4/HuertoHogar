@@ -48,6 +48,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.huertohogar.R
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
+
+
+
+
 sealed class Screen(val route: String){
     object Home: Screen("home")
     object Cart: Screen("cart")
@@ -84,11 +91,12 @@ fun GreenAppBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFF2E8B57))
+                .padding(WindowInsets.statusBars.asPaddingValues())
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, start = 16.dp, end = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .height(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -174,8 +182,9 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
 
     // Footer
     NavigationBar(
-        containerColor = Color(0xFFABABAB),
-        tonalElevation = 0.dp
+        modifier = Modifier.fillMaxWidth()
+            .height(85.dp),
+        containerColor = Color(0xFF2E8B57)
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },

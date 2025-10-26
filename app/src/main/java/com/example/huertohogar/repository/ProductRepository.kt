@@ -4,6 +4,7 @@ import com.example.huertohogar.data.ProductDao
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class ProductRepository(private val productDao: ProductDao) {
     
@@ -50,5 +51,17 @@ class ProductRepository(private val productDao: ProductDao) {
     // Eliminar todos los productos
     suspend fun deleteAllProducts() {
         productDao.deleteAllProducts()
+    }
+
+    companion object {
+        fun getProductsFlow(): Flow<List<Product>> {
+            // Lista de productos destacados para la pantalla principal
+            val products = listOf(
+                Product(id = 1, name = "Leche Natural", price = "$3.800", imagesRes = com.example.huertohogar.R.drawable.destacado2, category = ProductCategory.lacteos),
+                Product(id = 2, name = "Miel Orgánica", price = "$5.000", imagesRes = com.example.huertohogar.R.drawable.destacado1, category = ProductCategory.productosOrganicos),
+                Product(id = 3, name = "Platános Cavendish", price = "$800/Kg", imagesRes = com.example.huertohogar.R.drawable.destacado3, category = ProductCategory.frutas)
+            )
+            return flowOf(products)
+        }
     }
 }

@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Tip::class], version = 2, exportSchema = false)
+@Database(entities = [Tip::class, CategoryEntity::class], version = 3, exportSchema = false)
 abstract class TipDatabase : RoomDatabase() {
 
     abstract fun tipDao(): TipDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object{
         @Volatile

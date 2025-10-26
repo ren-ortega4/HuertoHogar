@@ -40,6 +40,15 @@ import com.example.huertohogar.view.components.TipCard
 import com.example.huertohogar.view.components.WelcomeCard
 import com.example.huertohogar.viewmodel.MainViewModel
 import com.example.huertohogar.viewmodel.TipViewModel
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.huertohogar.view.components.CategoryDetails
+import com.example.huertohogar.viewmodel.Category
+
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +65,8 @@ fun MainContent(
     val currentTip by tipViewModel.currentTip.collectAsState()
 
     val backgroundColor = MaterialTheme.colorScheme.background
+
+    var selectedCategory by remember { mutableStateOf<Category?>(null) }
 
     Box(
         modifier = modifier
@@ -133,13 +144,21 @@ fun MainContent(
                         items(uiState.categories){
                                 category ->
                             CategoryCard(
-                                name = category.first,
-                                imageRes = category.second,
-                                onClick = {}
+                                name = category.name,
+                                imageRes = category.imageRes,
+                                onClick = {selectedCategory = category}
                             )
                         }
                     }
                 }
+            }
+            selectedCategory?.let { category ->
+                CategoryDetails(
+                    categoryName = category.name,
+                    categoryImageRes = category.imageRes,
+                    categoryDescription = category.description,
+                    onDismiss = {selectedCategory = null}
+                )
             }
         }
     }

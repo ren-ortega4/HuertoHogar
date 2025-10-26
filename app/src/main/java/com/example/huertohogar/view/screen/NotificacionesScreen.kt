@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.huertohogar.viewmodel.NotificacionesViewModel
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +43,7 @@ fun NotificacionesScreen(
             ) {
                 IconButton(onClick = onClose) {
                     Icon(
-                        Icons.Default.ArrowBack,
+                        Icons.Filled.ArrowBackIosNew,
                         contentDescription = "Volver al menú",
                         tint = Color(0xFF388E3C)
                     )
