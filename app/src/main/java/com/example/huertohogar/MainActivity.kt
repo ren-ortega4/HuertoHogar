@@ -53,7 +53,6 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val notificacionesViewModel: NotificacionesViewModel = viewModel()
-                val profileViewModel: ProfileViewModel = viewModel()
                 val userViewModel: UserViewModel = viewModel(factory=factory)
 
                 val notifs by notificacionesViewModel.notificaciones.collectAsState(initial = emptyList())

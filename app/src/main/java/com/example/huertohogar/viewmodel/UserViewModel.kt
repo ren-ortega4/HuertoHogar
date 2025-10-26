@@ -72,7 +72,8 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
                         id = usuarioEncontrado.id,
                         nombre = usuarioEncontrado.nombre,
                         correo = usuarioEncontrado.correo,
-                        // --- CORRECCIÓN AQUÍ ---
+                        direccion = usuarioEncontrado.direccion,
+                        region = usuarioEncontrado.region,
                         fotopefil = usuarioEncontrado.fotopefil,
                         loginCorreo = "",
                         loginClave = "",
@@ -126,9 +127,9 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
         val estadoActual=_estado.value
         val erroresNuevos = estadoActual.errores.copy(
             nombre = if (estadoActual.nombre.isBlank()) "El nombre es requerido" else null,
-            correo = if (estadoActual.correo.contains("@"))"@ en el correo es requerida " else null,
-            clave = if (estadoActual.clave.isBlank())"La clave es requerida" else null,
-            confirmarClave = if (estadoActual.confirmarClave.isBlank()) "Confirme la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,
+            correo = if (!estadoActual.correo.contains("@"))"@ en el correo es requerida " else null,
+            clave = if (estadoActual.clave.length<8)"Debe tener al menos 8 caracteres" else null,
+            confirmarClave = if (estadoActual.confirmarClave.length<8) "Debe repetir la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,
             direccion = if (estadoActual.direccion.isBlank())"La direccion es requerida" else null,
             region = if(estadoActual.region.isBlank())"la region es requerida" else null,
         )

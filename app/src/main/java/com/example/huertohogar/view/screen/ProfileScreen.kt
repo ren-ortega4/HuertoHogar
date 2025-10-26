@@ -1,6 +1,7 @@
 package com.example.huertohogar.view.screen
 
 import android.Manifest
+import android.R
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -126,6 +128,13 @@ fun ProfileScreen(viewModel: UserViewModel,
                     modifier = Modifier.fillMaxSize()
                 ) {
                     ImagenInteligente(estado.fotopefil ?: "") // Componente de imagen de perfil
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Column {
+
+                        Text("Editar Foto De Perfil")
+
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -136,11 +145,18 @@ fun ProfileScreen(viewModel: UserViewModel,
                     ) {
                         Button(onClick = {
                             pickImageLauncher.launch("image/*") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF2E8B57),
+                                contentColor = Color.White
+                            ),
                             shape = RoundedCornerShape(10.dp)
-                        ) {
+                        )
+                        {
                             Text("GALERÍA")
                         }
                         Spacer(modifier = Modifier.width(16.dp))
+
+                        // boton camara
                         Button(onClick = {
                             when (PackageManager.PERMISSION_GRANTED) {
                                 ContextCompat.checkSelfPermission(
@@ -161,18 +177,37 @@ fun ProfileScreen(viewModel: UserViewModel,
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = estado.nombre,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = estado.correo,
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
+
+
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            buildAnnotatedString {
+                                withStyle(style = SpanStyle(color = Color(0xFF2E8B57), fontSize =24.sp, fontWeight = FontWeight.Bold)) {
+                                    append("NOMBRE: ")
+                                }
+                                withStyle(style = SpanStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)) {
+                                    append(estado.nombre)
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            buildAnnotatedString {
+                                withStyle(style = SpanStyle(color = Color(0xFF2E8B57), fontSize =24.sp, fontWeight = FontWeight.Bold)) {
+                                    append("CORREO: ")
+                                }
+                                withStyle(style = SpanStyle(color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)) {
+                                    append(estado.correo)
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                    }
+
                     Spacer(modifier = Modifier.height(32.dp))
+                    // boton cerrar sesion
                     Button(
                         onClick = { viewModel.logout() },
                         modifier = Modifier.fillMaxWidth(),
