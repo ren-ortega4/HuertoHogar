@@ -3,7 +3,7 @@ package com.example.huertohogar.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.huertohogar.data.AppDatabase
+import com.example.huertohogar.data.ProductDatabase
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.repository.ProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: ProductRepository
 
     init {
-        val productDao = AppDatabase.getDatabase(application).productDao()
+        val productDao = ProductDatabase.getDatabase(application).productDao()
         repository = ProductRepository(productDao)
         loadData()
     }

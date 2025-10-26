@@ -3,7 +3,7 @@ package com.example.huertohogar.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.huertohogar.data.AppDatabase
+import com.example.huertohogar.data.ProductDatabase
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
 import com.example.huertohogar.repository.ProductRepository
@@ -27,7 +27,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     val productsByCategory: StateFlow<List<Product>> = _productsByCategory.asStateFlow()
     
     init {
-        val productDao = AppDatabase.getDatabase(application).productDao()
+        val productDao = ProductDatabase.getDatabase(application).productDao()
         repository = ProductRepository(productDao)
         
         allProducts = MutableStateFlow<List<Product>>(emptyList()).apply {

@@ -55,7 +55,7 @@ fun toProductCategory(categoryString: String): ProductCategory
 ```
 
 ### 4. **Database - AppDatabase**
-📁 `data/AppDatabase.kt`
+📁 `data/ProductDatabase.kt`
 
 Clase abstracta que extiende RoomDatabase:
 
@@ -176,7 +176,7 @@ kapt("androidx.room:room-compiler:2.6.1")
 ### Creados:
 - ✅ `data/ProductDao.kt`
 - ✅ `data/Converters.kt`
-- ✅ `data/AppDatabase.kt`
+- ✅ `data/ProductDatabase.kt`
 - ✅ `viewmodel/ProductViewModel.kt`
 
 ### Modificados:
