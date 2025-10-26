@@ -1,5 +1,6 @@
 package com.example.huertohogar.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huertohogar.model.Usuario
@@ -36,58 +37,60 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
     )
 
     //<editor-fold desc="Funciones para el formulario de Registro">
-    fun onNombreChange (valor : String) {
-        _estado.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
-    }
-
-    fun onCorreoChange (valor : String) {
-        _estado.update { it.copy(correo = valor, errores = it.errores.copy(correo = null)) }
-    }
-
-    fun onClaveChange (valor : String) {
-        _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = null)) }
-    }
-
-    fun onConfirmarClaveChange (valor : String) {
-        _estado.update { it.copy(confirmarClave = valor, errores = it.errores.copy(confirmarClave = null)) }
-    }
-    fun onDireccionChange (valor : String) {
-        _estado.update { it.copy(direccion = valor, errores = it.errores.copy(direccion = null)) }
-    }
-
-    fun onRegionChange(valor:String){
-        _estado.update { it.copy(region = valor, errores = it.errores.copy(region = null)) }
-    }
-
-    fun onAceptarTerminosChange(valor : Boolean) {
-        _estado.update { it.copy(aceptaTerminos = valor) }
-    }
+    fun onNombreChange (valor : String) { _estado.update { it.copy(nombre = valor, errores = it.errores.copy()) } }
+    fun onCorreoChange (valor : String) { _estado.update { it.copy(correo = valor, errores = it.errores.copy()) } }
+    fun onClaveChange (valor : String) { _estado.update { it.copy(clave = valor, errores = it.errores.copy()) }}
+    fun onConfirmarClaveChange (valor : String) { _estado.update { it.copy(confirmarClave = valor, errores = it.errores.copy()) } }
+    fun onDireccionChange (valor : String) { _estado.update { it.copy(direccion = valor, errores = it.errores.copy()) } }
+    fun onRegionChange(valor:String){ _estado.update { it.copy(region = valor, errores = it.errores.copy()) } }
+    fun onAceptarTerminosChange(valor : Boolean) { _estado.update { it.copy(aceptaTerminos = valor) } }
     //</editor-fold>
 
     //<editor-fold desc="Funciones para el formulario de Login">
-    fun onLoginCorreoChange(valor: String) {
-        _estado.update { it.copy(loginCorreo = valor, errores = it.errores.copy(errorLoginCorreo = null)) }
-    }
-
-    fun onLoginClaveChange(valor: String) {
-        _estado.update { it.copy(loginClave = valor, errores = it.errores.copy(errorLoginClave = null)) }
-    }
+    fun onLoginCorreoChange(valor: String) { _estado.update { it.copy(loginCorreo = valor, errores = it.errores.copy()) } }
+    fun onLoginClaveChange(valor: String) { _estado.update { it.copy(loginClave = valor, errores = it.errores.copy()) } }
     //</editor-fold>
 
     //<editor-fold desc="Funciones de Sesión">
+    // En UserViewModel.kt
+
     fun login() {
-        _estado.update {
-            // En una app real, aquí validarías las credenciales.
-            // Aquí simulamos un inicio de sesión exitoso.
-            it.copy(
-                isLoggedIn = true,
-                nombre = "Ángel Prado", // Simulado
-                correo = it.loginCorreo, // Usamos el correo del login
-                loginCorreo = "", // Limpiamos el formulario de login
-                loginClave = ""
-            )
+        if (!validarLogin()) {
+            return
+        }
+
+        val correoLogin = _estado.value.loginCorreo
+        val claveLogin = _estado.value.loginClave
+
+        viewModelScope.launch {
+            val usuarioEncontrado = repository.login(correoLogin, claveLogin)
+
+            if (usuarioEncontrado != null) {
+                _estado.update {
+                    it.copy(
+                        isLoggedIn = true,
+                        id = usuarioEncontrado.id,
+                        nombre = usuarioEncontrado.nombre,
+                        correo = usuarioEncontrado.correo,
+                        // --- CORRECCIÓN AQUÍ ---
+                        fotopefil = usuarioEncontrado.fotopefil,
+                        loginCorreo = "",
+                        loginClave = "",
+                        errores = UserError()
+                    )
+                }
+            } else {
+                _estado.update {
+                    it.copy(
+                        errores = it.errores.copy(
+                            errorLoginGeneral = "Correo o clave incorrectos"
+                        )
+                    )
+                }
+            }
         }
     }
+
 
     fun logout() {
         // Al cerrar sesión, reseteamos el estado completamente,
@@ -127,7 +130,7 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
             clave = if (estadoActual.clave.isBlank())"La clave es requerida" else null,
             confirmarClave = if (estadoActual.confirmarClave.isBlank()) "Confirme la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null,
             direccion = if (estadoActual.direccion.isBlank())"La direccion es requerida" else null,
-            region = if(estadoActual.region.isBlank())"la region es requerida" else null
+            region = if(estadoActual.region.isBlank())"la region es requerida" else null,
         )
         val hayErrores= listOfNotNull(
             erroresNuevos.nombre,
@@ -145,7 +148,7 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
         val estadoActual = _estado.value
         val erroresNuevos = estadoActual.errores.copy(
             errorLoginCorreo = if (estadoActual.loginCorreo.isBlank()) "El correo es requerido" else null,
-            errorLoginClave = if (estadoActual.loginClave.isBlank()) "La clave es requerida" else null
+            errorLoginClave = if (estadoActual.loginClave.isBlank()) "La clave es requerida" else null,
         )
         val hayErrores = listOfNotNull(
             erroresNuevos.errorLoginCorreo,
@@ -162,7 +165,7 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
                 val nuevoUsuario= Usuario(
                     nombre = estadoActual.nombre,
                     correo = estadoActual.correo,
-                    clave = estadoActual.confirmarClave,
+                    clave = estadoActual.clave,
                     confirmarClave = estadoActual.confirmarClave,
                     direccion = estadoActual.direccion,
                     region = estadoActual.region,
@@ -171,6 +174,19 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
                 repository.insertar(nuevoUsuario)
             }
         }
+    }
+
+    fun actualizarFotoPerfil(nuevoUri : Uri?){
+        val usuarioId =_estado.value.id
+        if (usuarioId==0){
+            println("Error no ahi usuario para actualizar la foto")
+            return
+        }
+        val uriString= nuevoUri?.toString()
+        viewModelScope.launch { repository. actualizarFoto(usuarioId,uriString)
+
+        _estado.update { it.copy(fotopefil = uriString) }}
+        println("Foto de perfil actualizada")
     }
 
 }

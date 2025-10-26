@@ -1,7 +1,6 @@
 package com.example.huertohogar.view.screen
 
 import android.Manifest
-import android.R.attr.shape
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -49,7 +47,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.example.huertohogar.view.components.ImagenInteligente
-import com.example.huertohogar.viewmodel.ProfileViewModel
 import com.example.huertohogar.viewmodel.UserViewModel
 import java.io.File
 import java.text.SimpleDateFormat
@@ -58,16 +55,19 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(viewModel: UserViewModel, profileViewModel: ProfileViewModel, navController: NavController){
+fun ProfileScreen(viewModel: UserViewModel,
+                  navController: NavController){
+
     val estado by viewModel.estado.collectAsState()
     val context = LocalContext.current
-    val imagenUri by profileViewModel.imagenUri.collectAsState(initial = null)
+
+    //al imagenUri by profileViewModel.imagenUri.collectAsState(initial = null)
 
     // --- Launchers para Galería y Cámara ---
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { profileViewModel.setImage(it) }
+        uri?.let { viewModel.actualizarFotoPerfil(it) }
     }
 
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
@@ -76,7 +76,7 @@ fun ProfileScreen(viewModel: UserViewModel, profileViewModel: ProfileViewModel, 
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success) {
-            cameraUri?.let { profileViewModel.setImage(it) }
+            cameraUri?.let { viewModel.actualizarFotoPerfil(it) }
         }
     }
 
@@ -125,7 +125,7 @@ fun ProfileScreen(viewModel: UserViewModel, profileViewModel: ProfileViewModel, 
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    ImagenInteligente(imagenUri) // Componente de imagen de perfil
+                    ImagenInteligente(estado.fotopefil ?: "") // Componente de imagen de perfil
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -188,7 +188,7 @@ fun ProfileScreen(viewModel: UserViewModel, profileViewModel: ProfileViewModel, 
             } else {
                 // --- VISTA SIN SESIÓN INICIADA ---
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ImagenInteligente(imagenUri)
+                    ImagenInteligente(estado.fotopefil ?:"")
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = { navController.navigate("InicioSesion") },

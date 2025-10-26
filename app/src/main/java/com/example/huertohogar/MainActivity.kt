@@ -96,7 +96,6 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.Account.route) {
                             ProfileScreen(
                                 viewModel = userViewModel,
-                                profileViewModel = profileViewModel,
                                 navController = navController
                             )
                         }

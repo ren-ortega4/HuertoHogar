@@ -13,5 +13,6 @@ data class Usuario (
     val confirmarClave: String,
     val direccion: String,
     val region: String,
-    val aceptaTerminos: Boolean
+    val aceptaTerminos: Boolean,
+    val fotopefil: String? = null
 )

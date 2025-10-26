@@ -7,9 +7,11 @@ data class UserError(
     val clave: String? = null,
     val confirmarClave: String? = null,
     val direccion: String? = null,
-    val region:String? = null,
+    val region: String? = null,
 
     // Errores de Login
     val errorLoginCorreo: String? = null,
-    val errorLoginClave: String? = null
+    val errorLoginClave: String? = null,
+
+    val errorLoginGeneral: String?=null
 )

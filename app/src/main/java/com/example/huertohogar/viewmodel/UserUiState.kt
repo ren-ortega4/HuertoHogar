@@ -2,8 +2,13 @@ package com.example.huertohogar.viewmodel
 
 data class UserUiState(
     // Estado de Registro
+    val id : Int=0,
     val nombre : String="",
     val correo :String = "",
+    val fotopefil: String?=null,
+
+
+
     val clave : String = "",
     val confirmarClave: String = "",
     val direccion : String = "",

@@ -16,4 +16,10 @@ interface UsuarioDao {
 
     @Delete
     suspend fun eliminar(usuario: Usuario)
+
+    @Query("SELECT * FROM usuarios WHERE correo =:correo AND clave =:clave LIMIT 1")
+    suspend fun login(correo: String, clave: String): Usuario?
+
+    @Query("UPDATE usuarios SET fotopefil = :nuevaUri WHERE id = :idUsuario")
+    suspend fun actualizarFoto(idUsuario: Int, nuevaUri: String?)
 }
