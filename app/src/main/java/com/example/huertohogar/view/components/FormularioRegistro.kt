@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -99,6 +100,26 @@ fun FormScreen(
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ){
+                // Botón de volver flotante
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Volver",
+                        tint = if (isDark) Color.White else Color.Black // Color dinámico para el icono
+                    )
+                }
+            }
+
+
+
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -265,18 +286,6 @@ fun FormScreen(
                 }
             }
         }
-        // Botón de volver flotante
-        IconButton(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(8.dp)
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Volver",
-                tint = if (isDark) Color.White else Color.Black // Color dinámico para el icono
-            )
-        }
+
     }
 }

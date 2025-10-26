@@ -1,5 +1,6 @@
 package com.example.huertohogar.view.components
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
@@ -21,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +43,7 @@ import androidx.navigation.NavController
 import com.example.huertohogar.R
 import com.example.huertohogar.view.screen.Screen
 import com.example.huertohogar.viewmodel.UserViewModel
-
+import androidx.compose.ui.Alignment
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InicioSesion(navController: NavController,viewModel : UserViewModel){
@@ -78,6 +80,25 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            )
+            {
+                IconButton(
+                    onClick = {navController.popBackStack()},
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Volver",
+
+                        tint = if (isDark) Color.White else Color.Black
+                    )
+                }
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,10 +184,6 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Botón para ir al registro
-                TextButton(onClick = { /* TODO: Navegar a la pantalla de registro */ }) {
-                    Text("¿No tienes cuenta? Regístrate aquí")
-                }
             }
         }
     }
