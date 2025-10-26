@@ -18,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun ImagenInteligente(imagenUri: Uri?){
-    if (imagenUri != null){
+fun ImagenInteligente(imagenUri: String){
+    if (!imagenUri.isNullOrBlank()){
         Image(
             painter = rememberAsyncImagePainter(model = imagenUri),
             contentDescription = "Imagen del perfil",

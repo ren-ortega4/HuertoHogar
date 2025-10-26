@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -47,25 +48,45 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.huertohogar.R
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.ui.text.input.ImeAction
+
+
 sealed class Screen(val route: String){
     object Home: Screen("home")
     object Cart: Screen("cart")
     object Account: Screen("account")
+
+    object Product: Screen("product")
 }
 
 
 @Composable
-fun HomeContentScreen(modifier: Modifier = Modifier) {
-    MainContent(modifier)
+fun HomeContentScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToProducts: () -> Unit
+    ) {
+    MainContent(
+        modifier,
+        onNavigateToProducts = onNavigateToProducts
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GreenAppBar(
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     notificacionesNoLeidas : Int,
-    onNotificaionesClick: () -> Unit
+    onNotificaionesClick: () -> Unit,
+    onSearchTriggered: () -> Unit
 ) {
-    var searchText by remember { mutableStateOf("") }
 
     // Puedes ajustar el valor del top para margen superior (status bar)
     Surface(
@@ -76,11 +97,12 @@ fun GreenAppBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFF2E8B57))
+                .padding(WindowInsets.statusBars.asPaddingValues())
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, start = 16.dp, end = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .height(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -97,7 +119,16 @@ fun GreenAppBar(
                 //Buscador
                 TextField(
                     value = searchText,
-                    onValueChange = { searchText = it },
+                    onValueChange = onSearchTextChange,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            onSearchTriggered()
+                        }
+                    ),
                     leadingIcon = {
                         Icon(
                             Icons.Default.Search,
@@ -127,8 +158,7 @@ fun GreenAppBar(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         cursorColor = Color(0xFF388E3C),
-                    ),
-                    singleLine = true
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -157,70 +187,91 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    var startDestinationId by remember { mutableStateOf<Int?>(null) }
-    LaunchedEffect(navBackStackEntry) {
-        startDestinationId = runCatching {
-            navController.graph.findStartDestination().id
-        }.getOrNull()
-    }
-
     // Footer
     NavigationBar(
-        containerColor = Color(0xFFABABAB),
-        tonalElevation = 0.dp
+        modifier = Modifier.fillMaxWidth()
+            .height(85.dp),
+        containerColor = Color(0xFF2E8B57)
     ) {
+        // --- ITEM: INICIO (HOME) ---
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
             selected = currentRoute == Screen.Home.route,
             onClick = {
-                if (currentRoute != Screen.Home.route){
-                    navController.navigate(Screen.Home.route){
-                        launchSingleTop = true
-                        restoreState = true
-                        startDestinationId?.let {
-                            id -> popUpTo(id) {saveState = true}
-                        }
+                navController.navigate(Screen.Home.route) {
+                    // Saca todo del historial hasta la pantalla de inicio (home).
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
                     }
+                    // Evita relanzar la misma pantalla si ya estás en ella.
+                    launchSingleTop = true
+                    // Restaura el estado al volver a una pantalla.
+                    restoreState = true
                 }
             },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF388E3C)
             )
         )
+
+        // --- ITEM: PRODUCTOS (MENU) ---
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Inventory, contentDescription = "Productos") },
+            selected = currentRoute == Screen.Product.route,
+            onClick = {
+                navController.navigate(Screen.Product.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
+        )
+
+        // --- ITEM: CARRITO (SHOPPING_CART) ---
         NavigationBarItem(
             icon = {
-                BadgedBox(badge = { Badge { Text("$cartCount") } }) {
+                BadgedBox(badge = { if(cartCount > 0) Badge { Text("$cartCount") } }) {
                     Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito")
                 }
             },
             selected = currentRoute == Screen.Cart.route,
             onClick = {
-                if (currentRoute != Screen.Cart.route){
-                    navController.navigate(Screen.Cart.route){
-                        launchSingleTop = true
-                        restoreState = true
-                        startDestinationId?.let { id ->
-                            popUpTo(id) { saveState = true }
-                        }
+                navController.navigate(Screen.Cart.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
                     }
+                    launchSingleTop = true
+                    restoreState = true
                 }
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
         )
+
+        // --- ITEM: CUENTA (PERSON) ---
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Cuenta") },
             selected = currentRoute == Screen.Account.route,
             onClick = {
-                if (currentRoute != Screen.Account.route){
-                    navController.navigate(Screen.Account.route){
-                        launchSingleTop = true
-                        restoreState = true
-                        startDestinationId?.let { id ->
-                            popUpTo(id) { saveState = true }
-                        }
+                navController.navigate(Screen.Account.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
                     }
+                    launchSingleTop = true
+                    restoreState = true
                 }
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
         )
     }
 }
+
 
