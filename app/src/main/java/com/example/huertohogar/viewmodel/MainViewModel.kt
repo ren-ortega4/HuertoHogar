@@ -1,7 +1,9 @@
 package com.example.huertohogar.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.huertohogar.data.AppDatabase
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.repository.ProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,30 +17,35 @@ data class MainScreenUiState(
     val isLoading: Boolean = true
 )
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MainScreenUiState())
     val uiState: StateFlow<MainScreenUiState> = _uiState
+    
+    private val repository: ProductRepository
 
     init {
+        val productDao = AppDatabase.getDatabase(application).productDao()
+        repository = ProductRepository(productDao)
         loadData()
     }
 
     private fun loadData(){
         viewModelScope.launch {
-            val products = ProductRepository.products
-            val categories = listOf(
-                "Verduras" to R.drawable.verdura,
-                "Orgánicos" to R.drawable.organico,
-                "Frutas" to R.drawable.fruta,
-                "Lácteos" to R.drawable.lacteos
-            )
+            repository.getAllProducts().collect { products ->
+                val categories = listOf(
+                    "Verduras" to R.drawable.verdura,
+                    "Orgánicos" to R.drawable.organico,
+                    "Frutas" to R.drawable.fruta,
+                    "Lácteos" to R.drawable.lacteos
+                )
 
-            _uiState.value = MainScreenUiState(
-                featuredProducts = products,
-                categories = categories,
-                isLoading = false
-            )
+                _uiState.value = MainScreenUiState(
+                    featuredProducts = products,
+                    categories = categories,
+                    isLoading = false
+                )
+            }
         }
     }
 

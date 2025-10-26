@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -28,20 +29,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.huertohogar.R
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
-import com.example.huertohogar.repository.ProductRepository
 import com.example.huertohogar.viewmodel.CartViewModel
+import com.example.huertohogar.viewmodel.ProductViewModel
 
 
 @Composable
 fun ProductsByCategoryScreen(
     modifier: Modifier = Modifier,
     cartViewModel: CartViewModel,
+    productViewModel: ProductViewModel = viewModel(),
     onProductClick: (Product) -> Unit = {}
 ) {
-    val categories = ProductRepository.getAllCategories()
+    val allProducts by productViewModel.allProducts.collectAsState()
+    val categories = allProducts.map { it.category }.distinct().sortedBy { it.ordinal }
     val isDark = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -79,7 +83,7 @@ fun ProductsByCategoryScreen(
             items(categories) { category ->
                 CategorySection(
                     category = category,
-                    products = ProductRepository.getProductsByCategory(category),
+                    products = allProducts.filter { it.category == category },
                     cartViewModel = cartViewModel,
                     onProductClick = onProductClick
                 )
