@@ -7,20 +7,19 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -44,8 +43,13 @@ fun ProductsByCategoryScreen(
     productViewModel: ProductViewModel = viewModel(),
     onProductClick: (Product) -> Unit = {}
 ) {
-    val allProducts by productViewModel.allProducts.collectAsState()
-    val categories = allProducts.map { it.category }.distinct().sortedBy { it.ordinal }
+    // 1. Recolectar todos los estados necesarios del ViewModel
+    val categories by productViewModel.allCategories.collectAsState()
+    val productsByCategory by productViewModel.productsByCategory.collectAsState()
+    val selectedCategory by productViewModel.selectedCategory.collectAsState()
+    val searchedProducts by productViewModel.allProducts.collectAsState()
+    val searchQuery by productViewModel.searchQuery.collectAsState()
+
     val isDark = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
 
@@ -55,76 +59,97 @@ fun ProductsByCategoryScreen(
             .background(backgroundColor)
     ) {
         Image(
-            painter = painterResource(
-                if (isDark) R.drawable.fondooscuro else R.drawable.fondoblanco
-            ),
+            painter = painterResource(if (isDark) R.drawable.fondooscuro else R.drawable.fondoblanco),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2), // Definimos una base de 2 columnas
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
+            // --- Item 1: Título Principal (ocupa las 2 columnas) ---
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
-                    text = "Nuestros Productos",
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = "Tienda",
+                    style = MaterialTheme.typography.headlineLarge, // Más grande
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-
-
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
                 )
             }
 
-            items(categories) { category ->
-                CategorySection(
-                    category = category,
-                    products = allProducts.filter { it.category == category },
-                    cartViewModel = cartViewModel,
-                    onProductClick = onProductClick
-                )
+            // --- Lógica condicional: ¿Mostramos Búsqueda o Categorías? ---
+            if (searchQuery.isNotBlank()) {
+                // --- VISTA DE BÚSQUEDA ---
+                if (searchedProducts.isEmpty()) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Text(
+                            text = "No se encontraron productos para tu búsqueda.",
+                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    items(searchedProducts) { product ->
+                        ProductCard(
+                            product = product,
+                            cartViewModel = cartViewModel,
+                            onClick = { onProductClick(product) }
+                        )
+                    }
+                }
+            } else {
+                // --- VISTA POR CATEGORÍAS ---
+                // Sección de Categorías
+                items(categories) { category ->
+                    CategoryCard(
+                        category = category,
+                        isSelected = category == selectedCategory,
+                        onClick = { productViewModel.setSelectedCategory(category) }
+                    )
+                }
+
+                // Título de la sección de productos (ocupa las 2 columnas)
+                if (selectedCategory != null) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Text(
+                            text = "Productos en ${selectedCategory!!.displayName}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+                        )
+                    }
+                }
+
+                // Sección de Productos
+                if (productsByCategory.isEmpty() && selectedCategory != null) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Text(
+                            text = "No hay productos en esta categoría.",
+                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    items(productsByCategory) { product ->
+                        ProductCard(
+                            product = product,
+                            cartViewModel = cartViewModel,
+                            onClick = { onProductClick(product) }
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-@Composable
-fun CategorySection(
-    category: ProductCategory,
-    products: List<Product>,
-    cartViewModel: CartViewModel,
-    onProductClick: (Product) -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = category.displayName,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 12.dp)
-        )
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(products) { product ->
-                ProductCard(
-                    product = product,
-                    cartViewModel = cartViewModel,
-                    onClick = { onProductClick(product) }
-                )
-            }
-        }
-    }
-}
-
+// TU COMPOSABLE ProductCard (no necesita cambios)
 @Composable
 fun ProductCard(
     product: Product,
@@ -135,8 +160,7 @@ fun ProductCard(
 
     Card(
         modifier = Modifier
-            .width(180.dp)
-            .padding(8.dp),
+            .padding(vertical = 4.dp),
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
@@ -246,15 +270,67 @@ fun ProductCard(
                 Icon(
                     Icons.Default.ShoppingCart,
                     contentDescription = "Carrito",
-                    modifier = Modifier.size(8.dp)
+                    modifier = Modifier.size(18.dp) // Corregido: tamaño de icono realista
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(8.dp)) // Corregido: espacio mayor
                 Text(
                     text = "Añadir",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun CategoryCard(
+    category: ProductCategory,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    // Asignamos un icono a cada categoría
+    val icon = when (category) {
+        ProductCategory.frutas -> Icons.Filled.Inventory
+        ProductCategory.verduras -> Icons.Default.Inventory
+        ProductCategory.productosOrganicos -> Icons.Default.Inventory
+        ProductCategory.lacteos -> Icons.Default.Inventory
+        // Añade más casos si tienes más categorías
+        else -> Icons.Default.Inventory
+    }
+
+    Card(
+        modifier = Modifier
+            .aspectRatio(1f) // Esto hace que la tarjeta sea un cuadrado perfecto.
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        // Cambiamos el color según si está seleccionada.
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = category.displayName,
+                modifier = Modifier.size(48.dp),
+                tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = category.displayName,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

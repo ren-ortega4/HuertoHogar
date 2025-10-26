@@ -6,11 +6,11 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huertohogar.R
-import com.example.huertohogar.data.CategoryEntity
-import com.example.huertohogar.data.TipDatabase
+import com.example.huertohogar.model.CategoryEntity
+import com.example.huertohogar.data.local.AppDatabase
 import com.example.huertohogar.model.Product
-import com.example.huertohogar.repository.CategoryRepository
-import com.example.huertohogar.repository.ProductRepository
+import com.example.huertohogar.data.repository.CategoryRepository
+import com.example.huertohogar.data.repository.ProductRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -37,7 +37,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<MainScreenUiState>
 
     init {
-        val categoryDao = TipDatabase.getDatabase(application).categoryDao()
+        val categoryDao = AppDatabase.getDatabase(application).categoryDao()
         val categoryRepository = CategoryRepository(categoryDao)
 
         viewModelScope.launch {

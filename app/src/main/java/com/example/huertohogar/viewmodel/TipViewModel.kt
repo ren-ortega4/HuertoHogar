@@ -3,8 +3,8 @@ package com.example.huertohogar.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.huertohogar.data.Tip
-import com.example.huertohogar.data.TipDatabase
+import com.example.huertohogar.model.Tip
+import com.example.huertohogar.data.local.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class TipViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val tipDao = TipDatabase.getDatabase(application).tipDao()
+    private val tipDao = AppDatabase.getDatabase(application).tipDao()
 
     private val _currentTip = MutableStateFlow(Tip(iconName = "Info", title = "HuertoHogar", text = "Cargando tip..."))
     val currentTip: StateFlow<Tip> = _currentTip.asStateFlow()

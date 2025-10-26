@@ -46,7 +46,7 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.huertohogar.data.Tip
+import com.example.huertohogar.model.Tip
 import com.example.huertohogar.viewmodel.TipViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

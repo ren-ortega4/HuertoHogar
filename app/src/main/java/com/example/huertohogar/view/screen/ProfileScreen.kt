@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,12 +57,21 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(viewModel: UserViewModel,
-                  navController: NavController){
-
+                  navController: NavController
+){
     val estado by viewModel.estado.collectAsState()
     val context = LocalContext.current
+    val currentUser = estado.currentUser
 
-    //al imagenUri by profileViewModel.imagenUri.collectAsState(initial = null)
+    LaunchedEffect(currentUser) {
+        android.util.Log.d("ProfileScreen", "currentUser = $currentUser")
+    }
+
+    LaunchedEffect(estado) {
+        android.util.Log.d("ProfileScreen", "estado completo = $estado")
+    }
+
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     // --- Launchers para Galería y Cámara ---
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -69,8 +79,6 @@ fun ProfileScreen(viewModel: UserViewModel,
     ) { uri: Uri? ->
         uri?.let { viewModel.actualizarFotoPerfil(it) }
     }
-
-    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -118,14 +126,14 @@ fun ProfileScreen(viewModel: UserViewModel,
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            if (estado.isLoggedIn) {
+            if (currentUser != null) {
                 // --- VISTA CON SESIÓN INICIADA ---
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    ImagenInteligente(estado.fotopefil ?: "") // Componente de imagen de perfil
+                    ImagenInteligente(currentUser.fotopefil ?: "") // Componente de imagen de perfil
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -162,13 +170,13 @@ fun ProfileScreen(viewModel: UserViewModel,
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = estado.nombre,
+                        text = currentUser.nombre,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = estado.correo,
+                        text = currentUser.correo,
                         fontSize = 16.sp,
                         color = Color.Gray
                     )
@@ -188,7 +196,7 @@ fun ProfileScreen(viewModel: UserViewModel,
             } else {
                 // --- VISTA SIN SESIÓN INICIADA ---
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    ImagenInteligente(estado.fotopefil ?:"")
+                    ImagenInteligente(imagenUri = "")
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = { navController.navigate("InicioSesion") },

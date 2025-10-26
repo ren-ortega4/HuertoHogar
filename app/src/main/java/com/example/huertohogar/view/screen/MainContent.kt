@@ -43,6 +43,7 @@ import com.example.huertohogar.viewmodel.TipViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.huertohogar.view.components.CallToActionCard
 import com.example.huertohogar.view.components.CategoryDetails
 import com.example.huertohogar.viewmodel.Category
 
@@ -115,19 +116,17 @@ fun MainContent(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-            androidx.compose.material3.Button(
-                onClick = onNavigateToProducts,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF388E3C)
-                )
-            ) {
-                androidx.compose.material3.Text(
-                    "Ver Todos los Productos por Categoría",
-                    color = Color.White
+            Spacer(Modifier.height(24.dp))
+
+
+            AnimatedEntry(350) {
+                CallToActionCard(
+                    title = "Explora Nuestro Catálogo",
+                    buttonText = "Ver todos los productos por categoría",
+                    onClick = onNavigateToProducts
                 )
             }
+
 
             AnimatedEntry(400) {
                 Column(horizontalAlignment = Alignment.Start) {

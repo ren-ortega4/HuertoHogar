@@ -1,11 +1,16 @@
-package com.example.app.view
+package com.example.huertohogar.view.components
 
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -13,9 +18,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -26,9 +36,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -39,9 +48,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.huertohogar.R
 import com.example.huertohogar.viewmodel.UserViewModel
 
 
@@ -51,6 +64,7 @@ fun FormScreen(
     navController: NavController,
     viewModel: UserViewModel
 ){
+    val isDark = isSystemInDarkTheme()
     val estado by  viewModel.estado.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -61,173 +75,208 @@ fun FormScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("FORMULARIO DE REGISTRO") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF2E8B57),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                )
-            )
-        },
-        containerColor = Color.White // Color de fondo del Scaffold
-    ) { innerPadding ->
-        Column (
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(if (isDark) R.drawable.fondooscuro else R.drawable.fondoblanco),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // 3. --- Colocamos todo el formulario dentro de una Card semitransparente ---
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 32.dp) // Padding vertical para que no toque los bordes
+                .verticalScroll(rememberScrollState()), // Hacemos la tarjeta scrollable
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                // Color semitransparente para que "flote" sobre el fondo
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            //formulario de nombre
-            OutlinedTextField(
-                value = estado.nombre,
-                onValueChange = viewModel::onNombreChange,
-                label = { Text("Nombre") },
-                isError = estado.errores.nombre != null,
-                supportingText = {
-                    estado.errores.nombre?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // formulario de correo
-            OutlinedTextField(
-                value = estado.correo,
-                onValueChange = viewModel::onCorreoChange,
-                label = { Text("Correo") },
-                isError = estado.errores.correo != null,
-                supportingText = {
-                    estado.errores.correo?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            // formulario de clave
-            OutlinedTextField(
-                value = estado.clave,
-                onValueChange = viewModel::onClaveChange,
-                label = { Text("Clave") },
-                visualTransformation = PasswordVisualTransformation(),
-                isError = estado.errores.clave != null,
-                supportingText = {
-                    estado.errores.clave?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            // formulario de clave confirmar
-            OutlinedTextField(
-                value = estado.confirmarClave,
-                onValueChange = viewModel::onConfirmarClaveChange,
-                label = { Text("Confirmar Clave") },
-                visualTransformation = PasswordVisualTransformation(),
-                isError = estado.errores.confirmarClave != null,
-                supportingText = {
-                    estado.errores.confirmarClave?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // formulario de direccion
-            OutlinedTextField(
-                value = estado.direccion,
-                onValueChange = viewModel::onDireccionChange,
-                label = { Text("Direccion") },
-                isError = estado.errores.direccion != null,
-                supportingText = {
-                    estado.errores.direccion?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            // seleccionar region
-            ExposedDropdownMenuBox(
-                expanded = isDropdownExpanded,
-                onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp), // Padding interno de la tarjeta
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Espaciado entre elementos
             ) {
-                OutlinedTextField(
-                    value = estado.region,
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text("Región") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
-                    },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    isError = estado.errores.region != null,
-                    supportingText = {
-                        estado.errores.region?.let {
-                            Text(it, color = MaterialTheme.colorScheme.error)
-                        }
-                    }
+                Text(
+                    text = "Crea tu Cuenta",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                ExposedDropdownMenu(
+
+                // formulario de nombre
+                OutlinedTextField(
+                    value = estado.nombre,
+                    onValueChange = viewModel::onNombreChange,
+                    label = { Text("Nombre Completo") },
+                    leadingIcon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
+                    isError = estado.errores.nombre != null,
+                    supportingText = {
+                        estado.errores.nombre?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // formulario de correo
+                OutlinedTextField(
+                    value = estado.correo,
+                    onValueChange = viewModel::onCorreoChange,
+                    label = { Text("Correo Electrónico") },
+                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    isError = estado.errores.correo != null,
+                    supportingText = {
+                        estado.errores.correo?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // formulario de clave
+                OutlinedTextField(
+                    value = estado.clave,
+                    onValueChange = viewModel::onClaveChange,
+                    label = { Text("Contraseña") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = estado.errores.clave != null,
+                    supportingText = {
+                        estado.errores.clave?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // formulario de clave confirmar
+                OutlinedTextField(
+                    value = estado.confirmarClave,
+                    onValueChange = viewModel::onConfirmarClaveChange,
+                    label = { Text("Confirmar Contraseña") },
+                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = estado.errores.confirmarClave != null,
+                    supportingText = {
+                        estado.errores.confirmarClave?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // formulario de direccion
+                OutlinedTextField(
+                    value = estado.direccion,
+                    onValueChange = viewModel::onDireccionChange,
+                    label = { Text("Dirección") },
+                    leadingIcon = { Icon(Icons.Default.Place, contentDescription = null) },
+                    isError = estado.errores.direccion != null,
+                    supportingText = {
+                        estado.errores.direccion?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // seleccionar region
+                ExposedDropdownMenuBox(
                     expanded = isDropdownExpanded,
-                    onDismissRequest = { isDropdownExpanded = false }
+                    onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
                 ) {
-                    viewModel.regiones.forEach { region ->
-                        DropdownMenuItem(
-                            text = { Text(region) },
-                            onClick = {
-                                viewModel.onRegionChange(region)
-                                isDropdownExpanded = false
-                            }
-                        )
+                    OutlinedTextField(
+                        value = estado.region,
+                        onValueChange = { },
+                        readOnly = true,
+                        label = { Text("Región") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        isError = estado.errores.region != null,
+                        supportingText = {
+                            estado.errores.region?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        },
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false }
+                    ) {
+                        viewModel.regiones.forEach { region ->
+                            DropdownMenuItem(
+                                text = { Text(region) },
+                                onClick = {
+                                    viewModel.onRegionChange(region)
+                                    isDropdownExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
-            }
 
-            // acepto de terminos
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = estado.aceptaTerminos,
-                    onCheckedChange = viewModel::onAceptarTerminosChange,
-                    colors = CheckboxDefaults.colors(
-
-                        checkedColor = Color(0xFF2E8B57), // Color verde con código hexadecimal
-                        uncheckedColor = Color.Gray
+                // acepto de terminos
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = estado.aceptaTerminos,
+                        onCheckedChange = viewModel::onAceptarTerminosChange,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = Color(0xFF2E8B57),
+                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
+                    Spacer(Modifier.width(8.dp))
+                    Text("Acepto términos y condiciones", color = MaterialTheme.colorScheme.onSurface)
+                }
 
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Acepto terminos y condiciones",color = Color(0xFF2E8B57))
-            }
-            Button(
-                onClick = {
-                    if (viewModel.validarFormularioRegistro()) {
-                        viewModel.guardarUsuario()
-                        navController.navigate("InicioSesion") {
-                            // Limpia la pantalla de registro del historial de navegación
-                            popUpTo("FormularioRegistro") { inclusive = true }
+                // Botón de Registro
+                Button(
+                    onClick = {
+                        if (viewModel.validarFormularioRegistro()) {
+                            viewModel.guardarUsuario()
+                            navController.navigate("InicioSesion") {
+                                popUpTo("FormularioRegistro") { inclusive = true }
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E8B57), // Color verde con código hexadecimal
-                    contentColor = Color.White
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E8B57),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("REGISTRARME", fontWeight = FontWeight.Bold)
+                }
 
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("REGISTRAR")
+                // Botón para ir a inicio de sesión
+                TextButton(onClick = { navController.navigate("InicioSesion") }) {
+                    Text("¿Ya tienes cuenta? Inicia sesión")
+                }
             }
+        }
+        // Botón de volver flotante
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Volver",
+                tint = if (isDark) Color.White else Color.Black // Color dinámico para el icono
+            )
         }
     }
 }

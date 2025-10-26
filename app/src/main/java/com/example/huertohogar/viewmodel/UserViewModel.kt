@@ -1,21 +1,26 @@
 package com.example.huertohogar.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.huertohogar.model.Usuario
-import com.example.huertohogar.repository.UsuarioRepository
+import com.example.huertohogar.data.repository.UsuarioRepository
+import com.example.huertohogar.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
+class UserViewModel(
+    private val repository: UsuarioRepository, // Tu repositorio de Room
+) : ViewModel() {
     private val _estado = MutableStateFlow(UserUiState())
     val estado : StateFlow<UserUiState> = _estado
 
-
+    companion object {
+        private const val TAG = "UserViewModel"
+    }
 
     val regiones = listOf(
         "Arica y Parinacota",
@@ -55,51 +60,46 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
     // En UserViewModel.kt
 
     fun login() {
-        if (!validarLogin()) {
-            return
-        }
-
-        val correoLogin = _estado.value.loginCorreo
-        val claveLogin = _estado.value.loginClave
+        if (!validarLogin()) return
 
         viewModelScope.launch {
-            val usuarioEncontrado = repository.login(correoLogin, claveLogin)
+            Log.d(TAG, "Intentando login con: ${_estado.value.loginCorreo}")
+            val usuarioEncontrado = repository.login(_estado.value.loginCorreo, _estado.value.loginClave)
 
             if (usuarioEncontrado != null) {
+                Log.d(TAG, "Usuario encontrado: $usuarioEncontrado")
                 _estado.update {
                     it.copy(
                         isLoggedIn = true,
+                        currentUser = usuarioEncontrado, //Almacena usuario Completo
+                        loginCorreo = "",
+                        loginClave = "",
                         id = usuarioEncontrado.id,
                         nombre = usuarioEncontrado.nombre,
                         correo = usuarioEncontrado.correo,
                         direccion = usuarioEncontrado.direccion,
                         region = usuarioEncontrado.region,
                         fotopefil = usuarioEncontrado.fotopefil,
-                        loginCorreo = "",
-                        loginClave = "",
                         errores = UserError()
                     )
                 }
+                Log.d(TAG, "Estado después de update: ${_estado.value}")
             } else {
+                Log.d(TAG, "Login falló: usuario no encontrado")
                 _estado.update {
                     it.copy(
-                        errores = it.errores.copy(
-                            errorLoginGeneral = "Correo o clave incorrectos"
-                        )
+                        errores = it.errores.copy(errorLoginGeneral = "Correo o clave incorrectos")
                     )
                 }
             }
         }
     }
 
-
     fun logout() {
         // Al cerrar sesión, reseteamos el estado completamente,
         // excepto la preferencia de "recordar usuario".
         _estado.value = UserUiState(recordarUsuario = _estado.value.recordarUsuario)
     }
-    // Función común
-
 
     fun limpiarFormulario() {
         // Esta función ahora limpia SOLO los campos de los formularios,
@@ -160,34 +160,36 @@ class UserViewModel(private val repository: UsuarioRepository) : ViewModel(){
     }
 
     fun guardarUsuario(){
-        val estadoActual = _estado.value
         if (validarFormularioRegistro()) {
             viewModelScope.launch {
-                val nuevoUsuario= Usuario(
-                    nombre = estadoActual.nombre,
-                    correo = estadoActual.correo,
-                    clave = estadoActual.clave,
-                    confirmarClave = estadoActual.confirmarClave,
-                    direccion = estadoActual.direccion,
-                    region = estadoActual.region,
-                    aceptaTerminos = estadoActual.aceptaTerminos
+                val nuevoUser= User(
+                    nombre = _estado.value.nombre,
+                    correo = _estado.value.correo,
+                    clave = _estado.value.clave,
+                    confirmarClave = _estado.value.confirmarClave,
+                    direccion = _estado.value.direccion,
+                    region = _estado.value.region,
+                    aceptaTerminos = _estado.value.aceptaTerminos
                 )
-                repository.insertar(nuevoUsuario)
+                repository.insertar(nuevoUser)
+                limpiarFormulario()
             }
         }
     }
 
     fun actualizarFotoPerfil(nuevoUri : Uri?){
-        val usuarioId =_estado.value.id
-        if (usuarioId==0){
-            println("Error no ahi usuario para actualizar la foto")
+        val usuarioActual = _estado.value.currentUser
+        if (usuarioActual == null){
+            Log.d(TAG, "No hay un usuario en sesión para actualizar la foto")
+            println("No hay un usuario en sesión para actualizar la foto")
             return
         }
         val uriString= nuevoUri?.toString()
-        viewModelScope.launch { repository. actualizarFoto(usuarioId,uriString)
-
-            _estado.update { it.copy(fotopefil = uriString) }}
+        viewModelScope.launch { repository. actualizarFoto(usuarioActual.id,uriString)
+            _estado.update { it.copy(currentUser = usuarioActual.copy(fotopefil = uriString)) }}
+            Log.d(TAG, "Foto de perfil actualizada, nuevo estado usuario: ${_estado.value.currentUser}")
         println("Foto de perfil actualizada")
     }
+
 
 }
