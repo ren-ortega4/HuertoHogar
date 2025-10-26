@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -44,11 +45,14 @@ import com.example.huertohogar.R
 import com.example.huertohogar.view.screen.Screen
 import com.example.huertohogar.viewmodel.UserViewModel
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InicioSesion(navController: NavController,viewModel : UserViewModel){
     val estado by viewModel.estado.collectAsState()
     val isDark = isSystemInDarkTheme()
+    val scope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
         onDispose {
@@ -163,10 +167,14 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                 // Botón de inicio de sesión
                 Button(
                     onClick = {
-                        if (viewModel.validarLogin()) {
-                            viewModel.login()
-                            navController.navigate(Screen.Account.route) {
-                                popUpTo(Screen.Home.route) { inclusive = true }
+                        scope.launch {
+                            val loginExitoso = viewModel.login()
+                            if (loginExitoso){
+                                navController.navigate(Screen.Account.route) {
+                                    popUpTo(Screen.Home.route) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         }
                     },

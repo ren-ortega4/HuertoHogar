@@ -59,39 +59,47 @@ class UserViewModel(
     //<editor-fold desc="Funciones de Sesión">
     // En UserViewModel.kt
 
-    fun login() {
-        if (!validarLogin()) return
+    suspend fun login(): Boolean {
+        // 1. Validar el formato de los campos. Si es inválido, no continuar y retornar 'false'.
+        if (!validarLogin()) {
+            return false
+        }
 
-        viewModelScope.launch {
-            Log.d(TAG, "Intentando login con: ${_estado.value.loginCorreo}")
-            val usuarioEncontrado = repository.login(_estado.value.loginCorreo, _estado.value.loginClave)
+        // 2. Intentar el login en el repositorio.
+        Log.d(TAG, "Intentando login con: ${_estado.value.loginCorreo}")
+        val usuarioEncontrado = repository.login(_estado.value.loginCorreo, _estado.value.loginClave)
 
-            if (usuarioEncontrado != null) {
-                Log.d(TAG, "Usuario encontrado: $usuarioEncontrado")
-                _estado.update {
-                    it.copy(
-                        isLoggedIn = true,
-                        currentUser = usuarioEncontrado, //Almacena usuario Completo
-                        loginCorreo = "",
-                        loginClave = "",
-                        id = usuarioEncontrado.id,
-                        nombre = usuarioEncontrado.nombre,
-                        correo = usuarioEncontrado.correo,
-                        direccion = usuarioEncontrado.direccion,
-                        region = usuarioEncontrado.region,
-                        fotopefil = usuarioEncontrado.fotopefil,
-                        errores = UserError()
-                    )
-                }
-                Log.d(TAG, "Estado después de update: ${_estado.value}")
-            } else {
-                Log.d(TAG, "Login falló: usuario no encontrado")
-                _estado.update {
-                    it.copy(
-                        errores = it.errores.copy(errorLoginGeneral = "Correo o clave incorrectos")
-                    )
-                }
+        // 3. Procesar el resultado.
+        return if (usuarioEncontrado != null) {
+            // ÉXITO: Usuario encontrado
+            Log.d(TAG, "Usuario encontrado: $usuarioEncontrado")
+            _estado.update {
+                it.copy(
+                    isLoggedIn = true,
+                    currentUser = usuarioEncontrado, // Almacena usuario Completo
+                    loginCorreo = "", // Limpia los campos de login
+                    loginClave = "",
+                    id = usuarioEncontrado.id,
+                    nombre = usuarioEncontrado.nombre,
+                    correo = usuarioEncontrado.correo,
+                    direccion = usuarioEncontrado.direccion,
+                    region = usuarioEncontrado.region,
+                    fotopefil = usuarioEncontrado.fotopefil,
+                    errores = UserError() // Limpia los errores
+                )
             }
+            Log.d(TAG, "Estado después de update: ${_estado.value}")
+            true // Retorna 'true' para indicar éxito a la vista
+        } else {
+            // FALLO: Usuario no encontrado o clave incorrecta
+            Log.d(TAG, "Login falló: usuario no encontrado")
+            _estado.update {
+                it.copy(
+                    // Actualiza el estado con el mensaje de error específico
+                    errores = it.errores.copy(errorLoginClave = "Correo o clave incorrectos")
+                )
+            }
+            false // Retorna 'false' para indicar fallo a la vista
         }
     }
 
