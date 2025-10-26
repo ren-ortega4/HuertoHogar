@@ -5,21 +5,22 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Tip::class], version = 2, exportSchema = false)
-abstract class TipDatabase : RoomDatabase() {
+@Database(entities = [Tip::class, CategoryEntity::class], version = 3, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun tipDao(): TipDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object{
         @Volatile
-        private var INSTANCE: TipDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): TipDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    TipDatabase::class.java,
-                    "tip_database"
+                    AppDatabase::class.java,
+                    "huerto_hogar_database"
                 ).fallbackToDestructiveMigration()
                 .build()
                 INSTANCE = instance

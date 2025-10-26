@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -76,11 +79,13 @@ fun GreenAppBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFF2E8B57))
+                .padding(WindowInsets.statusBars.asPaddingValues())
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp, start = 16.dp, end = 16.dp)
+                    //top = 20dp
+                    .padding(start = 16.dp, end = 16.dp)
                     .height(64.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -166,8 +171,9 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
 
     // Footer
     NavigationBar(
-        containerColor = Color(0xFFABABAB),
-        tonalElevation = 0.dp
+        modifier = Modifier.fillMaxWidth()
+            .height(85.dp),
+        containerColor = Color(0xFF2E8B57)
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
@@ -204,7 +210,10 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                         }
                     }
                 }
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Cuenta") },
@@ -219,7 +228,10 @@ fun BottomNavigationBar(navController: NavController, cartCount: Int) {
                         }
                     }
                 }
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF388E3C)
+            )
         )
     }
 }

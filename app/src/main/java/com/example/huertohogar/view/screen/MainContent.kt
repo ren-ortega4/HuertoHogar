@@ -24,6 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,10 +37,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.huertohogar.R
 import com.example.huertohogar.view.components.AnimatedEntry
 import com.example.huertohogar.view.components.CategoryCard
+import com.example.huertohogar.view.components.CategoryDetails
 import com.example.huertohogar.view.components.FeaturedProductsRow
 import com.example.huertohogar.view.components.SectionTitle
 import com.example.huertohogar.view.components.TipCard
 import com.example.huertohogar.view.components.WelcomeCard
+import com.example.huertohogar.viewmodel.Category
 import com.example.huertohogar.viewmodel.MainViewModel
 import com.example.huertohogar.viewmodel.TipViewModel
 
@@ -55,6 +60,8 @@ fun MainContent(
     val currentTip by tipViewModel.currentTip.collectAsState()
 
     val backgroundColor = MaterialTheme.colorScheme.background
+
+    var selectedCategory by remember { mutableStateOf<Category?>(null) }
 
     Box(
         modifier = modifier
@@ -118,14 +125,23 @@ fun MainContent(
                         items(uiState.categories){
                                 category ->
                             CategoryCard(
-                                name = category.first,
-                                imageRes = category.second,
-                                onClick = {}
+                                name = category.name,
+                                imageRes = category.imageRes,
+                                onClick = {selectedCategory = category}
                             )
                         }
                     }
                 }
             }
+        }
+
+        selectedCategory?.let { category ->
+            CategoryDetails(
+                categoryName = category.name,
+                categoryImageRes = category.imageRes,
+                categoryDescription = category.description,
+                onDismiss = {selectedCategory = null}
+            )
         }
     }
 }
