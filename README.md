@@ -85,7 +85,7 @@ Este proyecto fue desarrollado por:
 
 1. **Clonar el Repositorio**
    ```bash
-   git clone --branch release/test --single-branch https://github.com/ren-ortega4/HuertoHogar.git
+   git clone https://github.com/ren-ortega4/HuertoHogar.git
    
 2. **Abrir Android Studio**
    **Selecciona File > Open y navega hasta la carpeta donde clonaste el proyecto.**
