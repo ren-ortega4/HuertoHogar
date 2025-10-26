@@ -37,7 +37,6 @@ import com.example.huertohogar.viewmodel.ProfileViewModel
 import com.example.huertohogar.viewmodel.UserViewModel
 import com.example.huertohogar.viewmodel.UsuarioViewModelFactory
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
