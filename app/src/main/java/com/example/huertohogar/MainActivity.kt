@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.huertohogar.data.local.AppDatabase
+import com.example.huertohogar.data.remote.ApiCliente
 import com.example.huertohogar.data.repository.UsuarioRepository
 import com.example.huertohogar.ui.theme.HuertoHogarTheme
 import com.example.huertohogar.view.components.FormScreen
@@ -37,9 +38,10 @@ import com.example.huertohogar.viewmodel.UserViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val db by lazy { AppDatabase.getDatabase(this) }
-    private val usuarioRepository by lazy { UsuarioRepository(db.usuarioDao()) }
-    private val userViewModelFactory by lazy { UserViewModelFactory(usuarioRepository) }
+    private val apiService by lazy { ApiCliente.instance }
+    private val usuarioRepository by lazy { UsuarioRepository(apiService) }
 
+    private val userViewModelFactory by lazy { UserViewModelFactory(usuarioRepository) }
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
         setTheme(R.style.Theme_HuertoHogar_Launcher)

@@ -11,20 +11,21 @@ import com.example.huertohogar.model.CategoryEntity
 import com.example.huertohogar.model.Tip
 import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
-import com.example.huertohogar.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@Database(entities = [Tip::class, CategoryEntity::class, Product::class, User::class], version = 4, exportSchema = false)
+// 1. Se elimina User::class de la lista de entidades
+@Database(entities = [Tip::class, CategoryEntity::class, Product::class], version = 8, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun tipDao(): TipDao
     abstract fun categoryDao(): CategoryDao
     abstract fun productDao(): ProductDao
-    abstract fun usuarioDao(): UsuarioDao
+    // 2. Se elimina la referencia a UsuarioDao
+    // abstract fun usuarioDao(): UsuarioDao
 
     companion object{
         @Volatile
@@ -47,10 +48,7 @@ abstract class AppDatabase : RoomDatabase() {
                         if (currentProducts.isEmpty()){
                             populateProducts(instance.productDao())
                         }
-                        val usuarios = instance.usuarioDao().obtenerUsuarios()
-                        if (usuarios.isEmpty()){
-                            populateInitialUser(instance.usuarioDao())
-                        }
+                        // 3. Se elimina toda la lógica de poblar usuarios
                     } catch (e: Exception){
                         e.printStackTrace()
                     }
@@ -66,7 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                     database ->
                     CoroutineScope(Dispatchers.IO).launch {
                         populateProducts(database.productDao())
-                        populateInitialUser(database.usuarioDao())
+                        // 4. Se elimina la llamada a poblar usuarios
                     }
                 }
             }
@@ -121,19 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
             productDao.insertProducts(products)
         }
 
-        suspend fun populateInitialUser(usuarioDao: UsuarioDao){
-            usuarioDao.insertar(
-                User(
-                    nombre = "Admin",
-                    correo = "admin@gmail.com",
-                    clave = "12345678",
-                    confirmarClave = "12345678",
-                    direccion = "admin",
-                    region = "admin",
-                    aceptaTerminos = true
-                )
-            )
-        }
+        // 5. Se elimina la función populateInitialUser por completo
     }
 
 }

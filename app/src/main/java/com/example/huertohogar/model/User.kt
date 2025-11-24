@@ -5,13 +5,17 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "usuarios")
 data class User (
-    @PrimaryKey(autoGenerate = true)val id : Int=0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val nombre: String,
+    val apellido: String,
     val correo: String,
-    val clave: String,
-    val confirmarClave: String,
-    val direccion: String,
     val region: String,
-    val aceptaTerminos: Boolean,
-    val fotopefil: String? = null
+    val contrasena: String,
+    val fecha_registro: String, // Se enviará la fecha como un texto (String)
+    val estado: Boolean,
+    val rol: RolRequest,
+    val fotopefil: String? = null,
+)
+data class RolRequest(
+    val id_rol: Int
 )
