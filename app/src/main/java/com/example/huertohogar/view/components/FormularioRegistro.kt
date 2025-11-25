@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.huertohogar.R
+import com.example.huertohogar.view.screen.Screen
 import com.example.huertohogar.viewmodel.UserViewModel
 
 
@@ -263,7 +264,7 @@ fun FormScreen(
                     onClick = {
                         if (viewModel.validarFormularioRegistro()) {
                             viewModel.guardarUsuario()
-                            navController.navigate("InicioSesion") {
+                            navController.navigate(Screen.Account.route) {
                                 popUpTo("FormularioRegistro") { inclusive = true }
                             }
                         }
@@ -281,7 +282,7 @@ fun FormScreen(
                 }
 
                 // Botón para ir a inicio de sesión
-                TextButton(onClick = { navController.navigate("InicioSesion") }) {
+                TextButton(onClick = { navController.navigate(Screen.Account.route) }) {
                     Text("¿Ya tienes cuenta? Inicia sesión")
                 }
             }
