@@ -35,7 +35,7 @@ fun FormScreen(
 ){
     val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
-    val estado by  viewModel.estado.collectAsState()
+    val estado by  viewModel.uiState.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     // esto es para que se limpie el formulario una vez que se sale de la pantalla de registro o inicio de sesion
@@ -231,17 +231,18 @@ fun FormScreen(
                 Button(
                     onClick = {
                         scope.launch { 
-                        if (viewModel.validarFormularioRegistro()) {
-                            if (viewModel.registrarUsuario()) {
-                            navController.navigate("InicioSesion") {
-                                popUpTo("FormularioRegistro") { inclusive = true }
+                            if (viewModel.validarFormularioRegistro()) {
+                                val registroExitoso = viewModel.registrarUsuario()
+                                if (registroExitoso) {
+                                    // Navega a login después del registro exitoso
+                                    navController.navigate("InicioSesion") {
+                                        popUpTo("FormularioRegistro") { inclusive = true }
+                                        launchSingleTop = true
+                                    }
                                 }
-
                             }
                         }
-
-                    }
-              },
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

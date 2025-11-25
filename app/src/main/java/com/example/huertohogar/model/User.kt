@@ -2,20 +2,74 @@ package com.example.huertohogar.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "usuarios")
-data class User (
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+@Entity(tableName = "usuario")
+data class UserEntity(
+    @PrimaryKey(autoGenerate = true) // Room genera automáticamente IDs únicos
+    val id: Long = 0, // Si la API devuelve ID, se usa; si no, Room genera uno
     val nombre: String,
     val apellido: String,
     val correo: String,
     val region: String,
-    val contrasena: String,
-    val fecha_registro: String, // Se enviará la fecha como un texto (String)
+    val fecha_registro: String,
     val estado: Boolean,
-    val rol: RolRequest,
-    val fotopefil: String? = null,
+    val fotopefil: String? = null
 )
+
+
+data class User(
+
+    @SerializedName("id")
+    val id: Long?,
+
+    @SerializedName("nombre")
+    val nombre: String,
+
+    @SerializedName("apellido")
+    val apellido: String,
+
+    @SerializedName("correo")
+    val correo: String,
+
+    @SerializedName("region")
+    val region: String,
+
+    @SerializedName("contrasena")
+    val contrasena: String,
+
+    @SerializedName("fecha_registro")
+    val fecha_registro: String,
+
+    @SerializedName("estado")
+    val estado: Boolean,
+
+    // El rol se ignora en la BD local, pero la API lo usa.
+    @SerializedName("rol")
+    val rol: RolRequest?,
+
+    @SerializedName("fotopefil")
+    val fotopefil: String? = null
+)
+
+// --- 3. FUNCIÓN DE MAPEO ---
+// Convierte el modelo de red (User) a la entidad de base de datos (UserEntity).
+fun User.toEntity(): UserEntity {
+    return UserEntity(
+        // CORREGIDO: Maneja el ID nulo de forma segura.
+        id = this.id ?: 0L,
+        nombre = this.nombre,
+        apellido = this.apellido,
+        correo = this.correo,
+        region = this.region,
+        fecha_registro = this.fecha_registro,
+        estado = this.estado,
+        fotopefil = this.fotopefil
+    )
+}
+
+// Objeto para el rol, no necesita cambios.
 data class RolRequest(
+    @SerializedName("id_rol")
     val id_rol: Int
 )

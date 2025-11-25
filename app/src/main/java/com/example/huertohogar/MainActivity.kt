@@ -37,9 +37,10 @@ import com.example.huertohogar.viewmodel.UserViewModel
 import com.example.huertohogar.viewmodel.UserViewModelFactory
 
 class MainActivity : ComponentActivity() {
-    private val db by lazy { AppDatabase.getDatabase(this) }
+    private val usarioDao by lazy{ AppDatabase.getDatabase(this).usuarioDao() }
     private val apiService by lazy { ApiCliente.instance }
-    private val usuarioRepository by lazy { UsuarioRepository(apiService) }
+    private val usuarioRepository by lazy {
+        UsuarioRepository(apiService = apiService, usuarioDao = usarioDao) }
 
     private val userViewModelFactory by lazy { UserViewModelFactory(usuarioRepository) }
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InicioSesion(navController: NavController,viewModel : UserViewModel){
-    val estado by viewModel.estado.collectAsState()
+    val estado by viewModel.uiState.collectAsState()
     val isDark = isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
 

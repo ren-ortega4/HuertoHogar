@@ -4,25 +4,84 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.huertohogar.data.remote.ApiCliente
 import com.example.huertohogar.data.repository.UsuarioRepository
 import com.example.huertohogar.model.RolRequest
 import com.example.huertohogar.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// --- 1. UNA ÚNICA CLASE PARA TODO EL ESTADO DE LA PANTALLA ---
+data class UserScreenUiState(
+    // Formulario de Registro
+    val nombre: String = "",
+    val apellido: String = "",
+    val correo: String = "",
+    val clave: String = "",
+    val confirmarClave: String = "",
+    val region: String = "",
+    val aceptaTerminos: Boolean = false,
+
+    // Formulario de Login
+    val loginCorreo: String = "",
+    val loginClave: String = "",
+
+    // Estado General de la UI
+    val isLoading: Boolean = false,
+    val errores: UserError = UserError(),
+
+    // Estado de la Sesión (vendrá del Flow de la BD)
+    val usuarioLogueado: User? = null
+)
+
 class UserViewModel(
-    // La inyección del repositorio es una buena práctica, pero asegúrate
-    // de tener un Factory para que el ViewModel pueda recibirlo.
-    private val repository: UsuarioRepository,
+    private val repository: UsuarioRepository
 ) : ViewModel() {
-    private val _estado = MutableStateFlow(UserUiState())
-    val estado: StateFlow<UserUiState> = _estado
+    // --- CORRECTA UBICACIÓN: función dentro del cuerpo de la clase ---
+    fun loginWithScope() {
+        viewModelScope.launch {
+            login()
+        }
+    }
+
+    // Estado privado SOLO para los campos que el usuario modifica en los formularios.
+    private val _formState = MutableStateFlow(UserScreenUiState())
+
+    // --- 2. UN ÚNICO STATEFLOW PÚBLICO PARA LA UI ---
+    val uiState: StateFlow<UserScreenUiState> = combine(
+        _formState,
+        repository.activeUser.map { userEntity -> 
+            userEntity?.let { entity ->
+                User(
+                    id = entity.id,
+                    nombre = entity.nombre,
+                    apellido = entity.apellido,
+                    correo = entity.correo,
+                    region = entity.region,
+                    contrasena = "",
+                    fecha_registro = entity.fecha_registro,
+                    estado = entity.estado,
+                    rol = null,
+                    fotopefil = entity.fotopefil
+                )
+            }
+        } // <-- Observamos la base de datos
+    ) { formState, activeUser ->
+        // Fusiona el estado del formulario con el usuario de la sesión
+        formState.copy(usuarioLogueado = activeUser)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UserScreenUiState() // Estado inicial vacío
+    )
 
     companion object {
         private const val TAG = "UserViewModel"
@@ -35,154 +94,119 @@ class UserViewModel(
         "Aysén del General Carlos Ibáñez del Campo", "Magallanes y de la Antártica Chilena"
     )
 
-    //<editor-fold desc="Funciones para el formulario de Registro">
-    fun onNombreChange(valor: String) { _estado.update { it.copy(nombre = valor) } }
-    fun onApellidoChange(valor: String) { _estado.update { it.copy(apellido = valor) } }
-    fun onCorreoChange(valor: String) { _estado.update { it.copy(correo = valor) } }
-    // CORREGIDO: Usar 'clave' en lugar de 'contrasena'
-    fun onClaveChange(valor: String) { _estado.update { it.copy(clave = valor) } }
-    // CORREGIDO: Usar 'confirmarClave' en lugar de 'confirmarContrasena'
-    fun onConfirmarClaveChange(valor: String) { _estado.update { it.copy(confirmarClave = valor) } }
-    fun onRegionChange(valor: String) { _estado.update { it.copy(region = valor) } }
-    fun onAceptarTerminosChange(valor: Boolean) { _estado.update { it.copy(aceptaTerminos = valor) } }
+    //<editor-fold desc="Funciones para actualizar el estado del formulario">
+    fun onNombreChange(valor: String) { _formState.update { it.copy(nombre = valor) } }
+    fun onApellidoChange(valor: String) { _formState.update { it.copy(apellido = valor) } }
+    fun onCorreoChange(valor: String) { _formState.update { it.copy(correo = valor) } }
+    fun onClaveChange(valor: String) { _formState.update { it.copy(clave = valor) } }
+    fun onConfirmarClaveChange(valor: String) { _formState.update { it.copy(confirmarClave = valor) } }
+    fun onRegionChange(valor: String) { _formState.update { it.copy(region = valor) } }
+    fun onAceptarTerminosChange(valor: Boolean) { _formState.update { it.copy(aceptaTerminos = valor) } }
+    fun onLoginCorreoChange(valor: String) { _formState.update { it.copy(loginCorreo = valor) } }
+    fun onLoginClaveChange(valor: String) { _formState.update { it.copy(loginClave = valor) } }
     //</editor-fold>
-
-    //<editor-fold desc="Funciones para el formulario de Login">
-    fun onLoginCorreoChange(valor: String) { _estado.update { it.copy(loginCorreo = valor) } }
-    fun onLoginClaveChange(valor: String) { _estado.update { it.copy(loginClave = valor) } }
-    //</editor-fold>
-
 
     suspend fun login(): Boolean {
-        if (!validarLogin()) {
-            return false
-        }
-        Log.d(TAG, "Intentando login con: ${_estado.value.loginCorreo}")
+        if (!validarLogin()) return false
+        _formState.update { it.copy(isLoading = true) }
+        val success = repository.login(uiState.value.loginCorreo, uiState.value.loginClave)
+        _formState.update { it.copy(isLoading = false) }
 
-        // Asumiendo que tu repository.login devuelve un token (String?) como en versiones anteriores.
-        val token = repository.login(_estado.value.loginCorreo, _estado.value.loginClave)
-
-        return if (token != null) {
-            Log.d(TAG, "Login exitoso, token obtenido: $token")
-            // Aquí deberías obtener los datos del usuario con otro llamado a la API usando el token
-            // y guardarlo en `currentUser`. Por ahora, solo guardamos el token.
-            _estado.update {
-                it.copy(
-                    isLoggedIn = true,
-                    authToken = token, // Guardamos el token en el estado
-                    loginCorreo = "", // Limpiamos campos de login
-                    loginClave = "",
-                    errores = UserError() // Limpiamos errores
-                )
-            }
-            true
-        } else {
-            Log.d(TAG, "Login falló: usuario no encontrado o clave incorrecta")
-            _estado.update {
-                it.copy(errores = it.errores.copy(errorLoginClave = "Correo o clave incorrectos"))
-            }
-            false
+        if (!success) {
+            _formState.update { it.copy(errores = it.errores.copy(errorLoginClave = "Correo o clave incorrectos")) }
         }
+        return success
     }
 
     fun logout() {
-        _estado.value = UserUiState(recordarUsuario = _estado.value.recordarUsuario)
-    }
-
-    fun limpiarFormulario() {
-        _estado.update {
-            it.copy(
-                nombre = "",
-                apellido = "",
-                correo = "",
-                clave = "", // CORREGIDO
-                confirmarClave = "", // CORREGIDO
-                region = "",
-                aceptaTerminos = false,
-                loginCorreo = "",
-                loginClave = "",
-                errores = UserError()
-            )
+        viewModelScope.launch {
+            repository.logout()
         }
     }
 
+    suspend fun registrarUsuario(): Boolean {
+        if (!validarFormularioRegistro()) return false
+        _formState.update { it.copy(isLoading = true) }
+
+        // CORREGIDO: El modelo User no tiene 'confirmarcontrasena'
+        val userParaRegistro = User(
+            id = 0,
+            nombre = uiState.value.nombre,
+            apellido = uiState.value.apellido,
+            correo = uiState.value.correo,
+            contrasena = uiState.value.clave,
+            fecha_registro = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()),
+            estado = true,
+            region = uiState.value.region,
+            rol = RolRequest(id_rol = 2)
+        )
+
+        val success = repository.register(userParaRegistro)
+        _formState.update { it.copy(isLoading = false) }
+
+        if (success) {
+            limpiarFormulario()
+        }
+        return success
+    }
+
+    fun limpiarFormulario() {
+        // Resetea solo los campos del formulario, el estado de la sesión se mantiene.
+        _formState.update {
+            UserScreenUiState(usuarioLogueado = it.usuarioLogueado)
+        }
+    }
+
+    private fun validarLogin(): Boolean {
+        // Tu lógica de validación usando 'uiState.value.loginCorreo', etc.
+        val estadoActual = uiState.value
+        val erroresNuevos = estadoActual.errores.copy(
+            errorLoginCorreo = if (estadoActual.loginCorreo.isBlank()) "El correo es requerido" else if (!estadoActual.loginCorreo.contains("@")) "El correo debe tener '@'" else null,
+            errorLoginClave = if (estadoActual.loginClave.isBlank()) "La clave es requerida" else if (estadoActual.loginClave.length < 8) "Debe tener al menos 8 caracteres" else null
+        )
+        val hayErrores = listOfNotNull(
+            erroresNuevos.errorLoginCorreo, erroresNuevos.errorLoginClave
+        ).isNotEmpty()
+        _formState.update { it.copy(errores = erroresNuevos) }
+        return !hayErrores
+    }
+
     fun validarFormularioRegistro(): Boolean {
-        val estadoActual = _estado.value
+        val estadoActual = uiState.value
+        // CORREGIDO: El data class UserError no tiene 'contrasena', usa 'clave'
         val erroresNuevos = UserError(
             nombre = if (estadoActual.nombre.isBlank()) "El nombre es requerido" else null,
             apellido = if (estadoActual.apellido.isBlank()) "El apellido es requerido" else null,
             correo = if (estadoActual.correo.isBlank()) "Correo es requerido" else if (!estadoActual.correo.contains("@")) "El correo debe tener '@'" else null,
             region = if (estadoActual.region.isBlank()) "La región es requerida" else null,
-            // CORREGIDO: Usar 'clave' y 'confirmarClave'
             contrasena = if (estadoActual.clave.isBlank()) "La clave es requerida" else if (estadoActual.clave.length < 8) "La clave debe tener al menos 8 caracteres" else null,
             confirmarContrasena = if (estadoActual.confirmarClave.isBlank()) "Debe repetir la clave" else if (estadoActual.clave != estadoActual.confirmarClave) "Las claves no coinciden" else null
         )
-        _estado.update { it.copy(errores = erroresNuevos) }
-
         val hayErrores = listOfNotNull(
             erroresNuevos.nombre, erroresNuevos.apellido, erroresNuevos.correo,
             erroresNuevos.region, erroresNuevos.contrasena, erroresNuevos.confirmarContrasena
         ).isNotEmpty()
-
+        _formState.update { it.copy(errores = erroresNuevos) }
         return !hayErrores
-    }
-
-    fun validarLogin(): Boolean {
-        val estadoActual = _estado.value
-        val erroresNuevos = estadoActual.errores.copy(
-            errorLoginCorreo = if (estadoActual.loginCorreo.isBlank()) "El correo es requerido" else if (!estadoActual.loginCorreo.contains("@")) "El correo debe tener '@'" else null,
-            errorLoginClave = if (estadoActual.loginClave.isBlank()) "La clave es requerida" else if (estadoActual.loginClave.length < 8) "Debe tener al menos 8 caracteres" else null
-        )
-        _estado.update { it.copy(errores = erroresNuevos) }
-
-        val hayErrores = listOfNotNull(
-            erroresNuevos.errorLoginCorreo, erroresNuevos.errorLoginClave
-        ).isNotEmpty()
-
-        return !hayErrores
-    }
-
-    suspend fun registrarUsuario(): Boolean {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val fechaActual = sdf.format(Date())
-
-        val user = User(
-            nombre = _estado.value.nombre,
-            apellido = _estado.value.apellido,
-            correo = _estado.value.correo,
-            region = _estado.value.region,
-            contrasena = _estado.value.clave, // CORREGIDO: Envía 'clave' del estado como 'contrasena' al modelo User
-            fecha_registro = fechaActual,
-            estado = true,
-            rol = RolRequest(id_rol = 2)
-        )
-
-        return try {
-            val response = ApiCliente.instance.registarUsusario(user)
-            if (response.isSuccessful) {
-                Log.d(TAG, "Registro exitoso")
-                true
-            } else {
-                Log.e(TAG, "Error al registrar usuario. Código: ${response.code()}")
-                false
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Excepción al registrar usuario", e)
-            false
-        }
     }
 
     fun actualizarFotoPerfil(nuevoUri: Uri?) {
-        val usuarioActual = _estado.value.currentUser
+        // CORREGIDO: Obtenemos el usuario de la sesión desde el estado unificado 'uiState'.
+        val usuarioActual = uiState.value.usuarioLogueado
         if (usuarioActual == null) {
             Log.d(TAG, "No hay un usuario en sesión para actualizar la foto")
             return
         }
+
         val uriString = nuevoUri?.toString()
         viewModelScope.launch {
-            // repository.actualizarFoto(usuarioActual.id, uriString) // Asegúrate de que esta función exista
-            _estado.update { it.copy(currentUser = usuarioActual.copy(fotopefil = uriString)) }
+            // Lógica para actualizar la foto:
+            // 1. Subir la imagen a un servidor y obtener la nueva URL (si es necesario).
+            // 2. Crear un objeto User actualizado.
+            val usuarioActualizado = usuarioActual.copy(fotopefil = uriString)
+            // 3. Llamar al repositorio para que actualice la API y la base de datos local.
+            // repository.updateUser(usuarioActualizado) // Suponiendo que el repo tiene un método update
+            Log.d(TAG, "Lógica de actualización de foto pendiente de implementar en el repositorio.")
         }
-        Log.d(TAG, "Foto de perfil actualizada, nuevo estado usuario: ${_estado.value.currentUser}")
     }
 }

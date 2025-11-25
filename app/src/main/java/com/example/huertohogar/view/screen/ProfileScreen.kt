@@ -69,9 +69,9 @@ fun ProfileScreen(
     viewModel: UserViewModel,
     navController: NavController
 ) {
-    val estado by viewModel.estado.collectAsState()
+    val estado by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val currentUser = estado.currentUser
+    val currentUser = estado.usuarioLogueado
     val isDark = isSystemInDarkTheme()
 
     LaunchedEffect(currentUser) {

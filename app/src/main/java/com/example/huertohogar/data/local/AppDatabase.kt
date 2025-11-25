@@ -15,9 +15,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.example.huertohogar.model.UserEntity
 
 // 1. Se elimina User::class de la lista de entidades
-@Database(entities = [Tip::class, CategoryEntity::class, Product::class], version = 8, exportSchema = false)
+@Database(entities = [Tip::class, CategoryEntity::class, Product::class, UserEntity::class], version = 13, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -25,7 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun productDao(): ProductDao
     // 2. Se elimina la referencia a UsuarioDao
-    // abstract fun usuarioDao(): UsuarioDao
+     abstract fun usuarioDao(): UsuarioDao
 
     companion object{
         @Volatile
@@ -40,7 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                     .addCallback(DatabaseCallBack())
                     .fallbackToDestructiveMigration()
-                .build()
+                    .build()
                 INSTANCE = instance
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
@@ -119,7 +120,6 @@ abstract class AppDatabase : RoomDatabase() {
             productDao.insertProducts(products)
         }
 
-        // 5. Se elimina la función populateInitialUser por completo
     }
 
 }

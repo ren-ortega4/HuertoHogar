@@ -27,5 +27,7 @@ data class UserUiState(
 
     // --- Estado Común / Otros ---
     val recordarUsuario: Boolean = false,
+
+    val registroExitoso: Boolean = false,
     val errores: UserError = UserError()
 )
