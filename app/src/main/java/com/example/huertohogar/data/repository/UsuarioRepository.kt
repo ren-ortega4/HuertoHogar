@@ -8,8 +8,6 @@ import com.example.huertohogar.model.User
 import com.example.huertohogar.model.UserEntity
 import kotlinx.coroutines.flow.Flow
 import com.example.huertohogar.model.toEntity
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 
 class UsuarioRepository(
@@ -31,18 +29,20 @@ class UsuarioRepository(
             
             // IMPORTANTE: Guardar en BD local SIN IMPORTAR si API falló
             // Así funciona offline
-            val userEntity = user.toEntity()
+            // Guardar usuario con estado = false (no activo)
+            val userEntity = user.toEntity().copy(estado = false)
             usuarioDao.upsert(userEntity)
-            Log.d("UsuarioRepository", "Usuario guardado en BD local (offline-first). NO inicia sesión automática.")
+            Log.d("UsuarioRepository", "Usuario guardado en BD local (offline-first). NO inicia sesión automática. Estado = false")
             return true
             
         } catch (e: Exception) {
             Log.w("UsuarioRepository", "API no disponible (${e.message}), guardando localmente en modo offline", e)
             // Modo offline: guardar en BD local aunque API falle
             return try {
-                val userEntity = user.toEntity()
+                // Guardar usuario con estado = false (no activo)
+                val userEntity = user.toEntity().copy(estado = false)
                 usuarioDao.upsert(userEntity)
-                Log.d("UsuarioRepository", "Usuario guardado en BD local en modo OFFLINE. NO inicia sesión automática.")
+                Log.d("UsuarioRepository", "Usuario guardado en BD local en modo OFFLINE. NO inicia sesión automática. Estado = false")
                 true
             } catch (dbException: Exception) {
                 Log.e("UsuarioRepository", "Error crítico: No se pudo guardar ni en API ni en BD local", dbException)

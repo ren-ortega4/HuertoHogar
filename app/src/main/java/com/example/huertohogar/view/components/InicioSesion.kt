@@ -3,13 +3,17 @@ package com.example.huertohogar.view.components
 import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,11 +25,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,7 +51,11 @@ import com.example.huertohogar.R
 import com.example.huertohogar.view.screen.Screen
 import com.example.huertohogar.viewmodel.UserViewModel
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +67,34 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
     DisposableEffect(Unit) {
         onDispose {
             viewModel.limpiarFormulario()
+        }
+    }
+    if (estado.isLoading) {
+        Dialog(onDismissRequest = { /* No hacer nada para que el usuario no pueda cerrarlo */ }) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Text(
+                        text = "Iniciando sesión...",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -169,11 +207,13 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                     onClick = {
                         scope.launch {
                             val loginExitoso = viewModel.login()
-                            if (loginExitoso){
+                            if (loginExitoso) {
+
                                 navController.navigate(Screen.Account.route) {
-                                    popUpTo(Screen.Home.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
                                         inclusive = true
                                     }
+                                    launchSingleTop = true
                                 }
                             }
                         }
@@ -181,17 +221,27 @@ fun InicioSesion(navController: NavController,viewModel : UserViewModel){
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    // Deshabilita el botón mientras está cargando
+                    enabled = !estado.isLoading,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2E8B57),
                         contentColor = Color.White
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("INGRESAR", fontWeight = FontWeight.Bold)
+
+                    if (estado.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("INGRESAR", fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-
             }
         }
     }

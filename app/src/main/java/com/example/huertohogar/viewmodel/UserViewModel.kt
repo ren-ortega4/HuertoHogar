@@ -19,46 +19,22 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// --- 1. UNA ÚNICA CLASE PARA TODO EL ESTADO DE LA PANTALLA ---
-data class UserScreenUiState(
-    // Formulario de Registro
-    val nombre: String = "",
-    val apellido: String = "",
-    val correo: String = "",
-    val clave: String = "",
-    val confirmarClave: String = "",
-    val region: String = "",
-    val aceptaTerminos: Boolean = false,
-
-    // Formulario de Login
-    val loginCorreo: String = "",
-    val loginClave: String = "",
-
-    // Estado General de la UI
-    val isLoading: Boolean = false,
-    val errores: UserError = UserError(),
-
-    // Estado de la Sesión (vendrá del Flow de la BD)
-    val usuarioLogueado: User? = null
-)
 
 class UserViewModel(
     private val repository: UsuarioRepository
 ) : ViewModel() {
-    // --- CORRECTA UBICACIÓN: función dentro del cuerpo de la clase ---
     fun loginWithScope() {
         viewModelScope.launch {
             login()
         }
     }
 
-    // Estado privado SOLO para los campos que el usuario modifica en los formularios.
-    private val _formState = MutableStateFlow(UserScreenUiState())
+    private val _formState = MutableStateFlow(UserUiState())
 
     // --- 2. UN ÚNICO STATEFLOW PÚBLICO PARA LA UI ---
-    val uiState: StateFlow<UserScreenUiState> = combine(
+    val uiState: StateFlow<UserUiState> = combine(
         _formState,
-        repository.activeUser.map { userEntity -> 
+        repository.activeUser.map { userEntity ->
             userEntity?.let { entity ->
                 User(
                     id = entity.id,
@@ -76,11 +52,11 @@ class UserViewModel(
         } // <-- Observamos la base de datos
     ) { formState, activeUser ->
         // Fusiona el estado del formulario con el usuario de la sesión
-        formState.copy(usuarioLogueado = activeUser)
+        formState.copy(currentUser = activeUser)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UserScreenUiState() // Estado inicial vacío
+        initialValue = UserUiState() // Estado inicial vacío
     )
 
     companion object {
@@ -153,7 +129,7 @@ class UserViewModel(
     fun limpiarFormulario() {
         // Resetea solo los campos del formulario, el estado de la sesión se mantiene.
         _formState.update {
-            UserScreenUiState(usuarioLogueado = it.usuarioLogueado)
+            UserUiState(currentUser =it.currentUser )
         }
     }
 
@@ -192,7 +168,7 @@ class UserViewModel(
 
     fun actualizarFotoPerfil(nuevoUri: Uri?) {
         // CORREGIDO: Obtenemos el usuario de la sesión desde el estado unificado 'uiState'.
-        val usuarioActual = uiState.value.usuarioLogueado
+        val usuarioActual = uiState.value.currentUser
         if (usuarioActual == null) {
             Log.d(TAG, "No hay un usuario en sesión para actualizar la foto")
             return

@@ -56,7 +56,6 @@ data class User(
 // Convierte el modelo de red (User) a la entidad de base de datos (UserEntity).
 fun User.toEntity(): UserEntity {
     return UserEntity(
-        // CORREGIDO: Maneja el ID nulo de forma segura.
         id = this.id ?: 0L,
         nombre = this.nombre,
         apellido = this.apellido,

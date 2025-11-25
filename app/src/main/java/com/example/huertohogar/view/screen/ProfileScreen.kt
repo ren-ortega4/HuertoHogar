@@ -71,8 +71,9 @@ fun ProfileScreen(
 ) {
     val estado by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val currentUser = estado.usuarioLogueado
+    val currentUser = estado.currentUser
     val isDark = isSystemInDarkTheme()
+
 
     LaunchedEffect(currentUser) {
         android.util.Log.d("ProfileScreen", "currentUser = $currentUser")
@@ -179,7 +180,6 @@ fun ProfileScreen(
                             Spacer(modifier = Modifier.width(16.dp))
                             Button(
                                 onClick = {
-                                    // Lógica de permisos CORREGIDA
                                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                         val uri = createImageUri(context)
                                         cameraUri = uri

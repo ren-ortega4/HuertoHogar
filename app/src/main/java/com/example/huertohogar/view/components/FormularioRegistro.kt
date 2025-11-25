@@ -1,5 +1,6 @@
 package com.example.huertohogar.view.components
 
+import android.os.Message
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.huertohogar.R
 import com.example.huertohogar.viewmodel.UserViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -37,6 +40,15 @@ fun FormScreen(
     val isDark = isSystemInDarkTheme()
     val estado by  viewModel.uiState.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    // variable para el manejo de estado
+    var showDialog by remember {  mutableStateOf(false)}
+    var dialogMessage by remember { mutableStateOf("") }
+
+    if (showDialog){
+        LoadingDialog(dialogMessage = dialogMessage)
+    }
+
 
     // esto es para que se limpie el formulario una vez que se sale de la pantalla de registro o inicio de sesion
     DisposableEffect(Unit) {
@@ -230,30 +242,39 @@ fun FormScreen(
                 // Botón de Registro
                 Button(
                     onClick = {
-                        scope.launch { 
-                            if (viewModel.validarFormularioRegistro()) {
-                                val registroExitoso = viewModel.registrarUsuario()
-                                if (registroExitoso) {
-                                    // Navega a login después del registro exitoso
-                                    navController.navigate("InicioSesion") {
-                                        popUpTo("FormularioRegistro") { inclusive = true }
-                                        launchSingleTop = true
-                                    }
+                        if (viewModel.validarFormularioRegistro()){
+                            scope.launch {
+                                // muestra el dialogo de registro
+                                dialogMessage="Guardando...."
+                                showDialog=true
+
+                                // inicia el registro con un tiempo de 3 segundos
+                                val registrojob = async { viewModel.registrarUsuario() }
+                                val delayJob = async { delay(3000) }
+
+                                // espera a que ambos terminen
+                                val registroExitoso = registrojob.await()
+                                delayJob.await()
+
+                                if (registroExitoso){
+                                    dialogMessage = "Usuario Registrado Con Exito !"
+                                    delay(1500)
+
+                                    showDialog=false
+                                    navController.navigate("InicioSesion")
+                                }else {
+                                    showDialog =false
+
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E8B57),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                    }, modifier = Modifier.fillMaxWidth()
+
+
                 ) {
-                    Text("REGISTRARME", fontWeight = FontWeight.Bold)
+                    Text("Registar")
                 }
+
 
                 // Botón para ir a inicio de sesión
                 TextButton(onClick = { navController.navigate("InicioSesion") }) {
@@ -263,4 +284,30 @@ fun FormScreen(
         }
 
     }
+}
+@Composable
+fun LoadingDialog(dialogMessage: String){
+    AlertDialog(
+        onDismissRequest = {},
+        containerColor = Color.DarkGray,
+        title = {
+            Text(
+                "Procesando registro",
+                color = Color(0xFF2E8B57)
+            )
+        },
+        text = {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(16.dp)
+            ){
+                CircularProgressIndicator(color = Color(0xFF2E8B57))
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = dialogMessage,
+                    color = Color(0xFF2E8B57)
+                )
+            }
+        }, confirmButton = {}
+    )
 }
