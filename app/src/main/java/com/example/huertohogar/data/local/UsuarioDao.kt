@@ -26,13 +26,10 @@ interface UsuarioDao {
     suspend fun upsert(user: UserEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertAll(users: List<UserEntity>) // Muy útil para sincronizar desde la API
+    suspend fun upsertAll(users: List<UserEntity>)
+    // útil para sincronizar desde la API
 
-
-    @Delete
-    suspend fun delete(user: UserEntity)
-
-
-    @Query("DELETE FROM usuario")
-    suspend fun clearAllUsers()
+    @Query("DELETE FROM usuario WHERE id = :userId")
+    suspend fun deleteById(userId: Long)
 }
+

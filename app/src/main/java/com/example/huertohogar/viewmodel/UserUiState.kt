@@ -5,6 +5,7 @@ data class UserUiState(
 
     // --- Estado de la Sesión ---
     val currentUser: User? = null,
+    val idApi : Int? =null,
     val isLoggedIn: Boolean = false,
     val authToken: String? = null, // Para guardar el token JWT de la API
     // Estado General de la UI
@@ -30,4 +31,5 @@ data class UserUiState(
     val registroExitoso: Boolean = false,
     val errores: UserError = UserError()
 )
+
 

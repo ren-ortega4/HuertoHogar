@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.huertohogar.data.repository.UsuarioRepository
 import com.example.huertohogar.model.RolRequest
 import com.example.huertohogar.model.User
+import com.example.huertohogar.model.UserEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -51,8 +53,9 @@ class UserViewModel(
             }
         } // <-- Observamos la base de datos
     ) { formState, activeUser ->
+        val idApi = (activeUser as? UserEntity)?.idApi
         // Fusiona el estado del formulario con el usuario de la sesión
-        formState.copy(currentUser = activeUser)
+        formState.copy(currentUser = activeUser,idApi= idApi)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -177,6 +180,22 @@ class UserViewModel(
         viewModelScope.launch{
             repository.ActualizarFotoPerfil(usuarioActual.id?:0L ,uriString)
         }
-        
     }
+
+    fun eliminarCuenta() {
+        viewModelScope.launch {
+            val userEntity = repository.activeUser.first()
+            val idApi = userEntity?.idApi
+            val idLocal = userEntity?.id
+
+            if (idApi != null) {
+                repository.eliminarUsuarioApi(idApi)
+            }
+            if (idLocal != null) {
+                repository.eliminarUsuarioLocal(idLocal)
+            }
+            logout()
+        }
+    }
+
 }

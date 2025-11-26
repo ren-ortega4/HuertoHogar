@@ -1,5 +1,6 @@
 package com.example.huertohogar.data.repository
 
+import android.R
 import android.util.Log
 import com.example.huertohogar.data.local.UsuarioDao
 import com.example.huertohogar.data.remote.ApiService
@@ -17,6 +18,8 @@ class UsuarioRepository(
 
     val activeUser: Flow<UserEntity?> = usuarioDao.getActiveUser()
 
+
+    // función de registro mejorada con modo offline-first
     suspend fun register(user: User): Boolean {
         return try {
             // Intentar registrar en la API
@@ -26,7 +29,6 @@ class UsuarioRepository(
             } else {
                 Log.w("UsuarioRepository", "Advertencia: Error en registro API ${response.code()}, pero se guardará localmente")
             }
-            
             // IMPORTANTE: Guardar en BD local SIN IMPORTAR si API falló
             // Así funciona offline
             // Guardar usuario con estado = false (no activo)
@@ -50,6 +52,8 @@ class UsuarioRepository(
             }
         }
     }
+
+    // función de login mejorada con fallback offline
     suspend fun login(correo: String, clave: String): Boolean {
         val loginRequest = LoginRequest(correo = correo, contrasena = clave)
         try {
@@ -112,7 +116,7 @@ class UsuarioRepository(
         }
     }
 
-    // --- LOGIN OFFLINE: Busca en BD local y valida contraseña ---
+    // función auxiliar para login offline
     private suspend fun loginOffline(correo: String, clave: String): Boolean {
         return try {
             Log.d("UsuarioRepository", "Buscando usuario '$correo' en BD local...")
@@ -133,6 +137,7 @@ class UsuarioRepository(
         }
     }
 
+    // cerrar sesión
     suspend fun logout() {
         Log.d("UsuarioRepository", "Cerrando sesión. Marcando usuario como inactivo en la BD local.")
         val activeUser: UserEntity? = usuarioDao.getActiveUser().first()
@@ -143,11 +148,22 @@ class UsuarioRepository(
         }
     }
 
+    // actualizar foto de perfil
     suspend fun ActualizarFotoPerfil(userId:Long,uriString:String?){
         val usuarioActual=usuarioDao.getUserById(userId).first()
         if(usuarioActual!=null){
             val usuarioActualizado=usuarioActual.copy(fotopefil=uriString)
             usuarioDao.upsert(usuarioActualizado)
         }
+    }
+
+
+
+    // eliminar usuario tanto en API como en BD local
+    suspend fun eliminarUsuarioApi(id: Int){
+        val response= apiService.eliminarUsuario(id)
+    }
+    suspend fun eliminarUsuarioLocal(idLocal : Long){
+        usuarioDao.deleteById(idLocal)
     }
 }

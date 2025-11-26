@@ -1,5 +1,6 @@
 package com.example.huertohogar.model
 
+import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
@@ -7,7 +8,8 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "usuario", indices = [androidx.room.Index(value = ["correo"], unique = true)])
 data class UserEntity(
     @PrimaryKey(autoGenerate = true) // Room genera automáticamente IDs únicos
-    val id: Long = 0, // Si la API devuelve ID, se usa; si no, Room genera uno
+    val id: Long = 0, // id local
+    val idApi: Int?= null, // id proporcionado de la api externa
     val nombre: String,
     val apellido: String,
     val correo: String,
@@ -20,7 +22,7 @@ data class UserEntity(
 
 data class User(
 
-    @SerializedName("id")
+    @SerializedName("id_usuario")
     val id: Long?,
 
     @SerializedName("nombre")
@@ -57,6 +59,7 @@ data class User(
 fun User.toEntity(): UserEntity {
     return UserEntity(
         id = this.id ?: 0L,
+        idApi = this.id?.toInt(),
         nombre = this.nombre,
         apellido = this.apellido,
         correo = this.correo,

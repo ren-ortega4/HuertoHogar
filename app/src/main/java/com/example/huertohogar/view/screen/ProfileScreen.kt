@@ -230,6 +230,20 @@ fun ProfileScreen(
                             color = Color.Gray
                         )
                         Spacer(modifier = Modifier.height(32.dp))
+
+                        Button(
+                            onClick = {viewModel.eliminarCuenta()},
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFD32F2F),
+                                contentColor= Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("ELIMINAR CUENTA")
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
                         Button(
                             onClick = { viewModel.logout() },
                             modifier = Modifier.fillMaxWidth(),
