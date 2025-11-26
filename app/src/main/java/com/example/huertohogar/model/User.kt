@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "usuario")
+@Entity(tableName = "usuario", indices = [androidx.room.Index(value = ["correo"], unique = true)])
 data class UserEntity(
     @PrimaryKey(autoGenerate = true) // Room genera automáticamente IDs únicos
     val id: Long = 0, // Si la API devuelve ID, se usa; si no, Room genera uno

@@ -86,10 +86,33 @@ fun ProfileScreen(
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     // --- Launchers para Galería y Cámara ---
+    // Función para copiar la imagen seleccionada a la carpeta privada
+    fun copiarImagenAGaleriaPrivada(context: Context, uri: Uri): Uri? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val nombreArchivo = "profile_${System.currentTimeMillis()}.jpg"
+            val directorio = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val archivo = java.io.File(directorio, nombreArchivo)
+            val outputStream = java.io.FileOutputStream(archivo)
+            inputStream?.copyTo(outputStream)
+            inputStream?.close()
+            outputStream.close()
+            Uri.fromFile(archivo)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { viewModel.actualizarFotoPerfil(it) }
+        uri?.let {
+            val uriPersistente = copiarImagenAGaleriaPrivada(context, it)
+            uriPersistente?.let { persistUri ->
+                viewModel.actualizarFotoPerfil(persistUri)
+            }
+        }
     }
 
     val takePictureLauncher = rememberLauncherForActivityResult(

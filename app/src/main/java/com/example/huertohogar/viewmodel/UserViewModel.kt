@@ -173,16 +173,10 @@ class UserViewModel(
             Log.d(TAG, "No hay un usuario en sesión para actualizar la foto")
             return
         }
-
         val uriString = nuevoUri?.toString()
-        viewModelScope.launch {
-            // Lógica para actualizar la foto:
-            // 1. Subir la imagen a un servidor y obtener la nueva URL (si es necesario).
-            // 2. Crear un objeto User actualizado.
-            val usuarioActualizado = usuarioActual.copy(fotopefil = uriString)
-            // 3. Llamar al repositorio para que actualice la API y la base de datos local.
-            // repository.updateUser(usuarioActualizado) // Suponiendo que el repo tiene un método update
-            Log.d(TAG, "Lógica de actualización de foto pendiente de implementar en el repositorio.")
+        viewModelScope.launch{
+            repository.ActualizarFotoPerfil(usuarioActual.id?:0L ,uriString)
         }
+        
     }
 }

@@ -82,10 +82,21 @@ class UsuarioRepository(
             if (userFromApi != null) {
                 Log.d("UsuarioRepository", "Paso 3 exitoso: Datos de '${userFromApi.nombre}' encontrados en la lista.")
 
-                // --- MAGIA FINAL: GUARDAR EN LA BASE DE DATOS LOCAL ---
-                val userEntity = userFromApi.toEntity()
+                // Si el usuario existe en la BD local, usa su id local; si no, usa el id de la API
+                val usuariosLocales = usuarioDao.getAllUsers().first()
+                val usuarioLocal = usuariosLocales.find { it.correo == userFromApi.correo }
+
+                val userEntity = if (usuarioLocal !=null){
+                    userFromApi.toEntity().copy(
+                        id = usuarioLocal.id,
+                        estado = true,
+                        fotopefil = usuarioLocal.fotopefil?: userFromApi.fotopefil
+                    )
+                }else{
+                    userFromApi.toEntity().copy(estado = true)
+                }
                 usuarioDao.upsert(userEntity)
-                Log.d("UsuarioRepository", "Usuario guardado en la BD local.")
+                Log.d("UsuarioRepository", "Usuario guardado/actualizado en la BD local, id local nunca se modifica si ya existe.")
                 return true
             } else {
                 Log.e("UsuarioRepository", "Paso 3 fallido: El usuario no se encontró en la lista devuelta por la API.")
@@ -129,6 +140,14 @@ class UsuarioRepository(
             val userInactivo = activeUser.copy(estado = false)
             usuarioDao.upsert(userInactivo)
             Log.d("UsuarioRepository", "Usuario marcado como inactivo. Otros usuarios siguen en la BD.")
+        }
+    }
+
+    suspend fun ActualizarFotoPerfil(userId:Long,uriString:String?){
+        val usuarioActual=usuarioDao.getUserById(userId).first()
+        if(usuarioActual!=null){
+            val usuarioActualizado=usuarioActual.copy(fotopefil=uriString)
+            usuarioDao.upsert(usuarioActualizado)
         }
     }
 }

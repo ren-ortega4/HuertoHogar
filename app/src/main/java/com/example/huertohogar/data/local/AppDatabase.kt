@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import com.example.huertohogar.model.UserEntity
 
 // 1. Se elimina User::class de la lista de entidades
-@Database(entities = [Tip::class, CategoryEntity::class, Product::class, UserEntity::class], version = 14, exportSchema = false)
+@Database(entities = [Tip::class, CategoryEntity::class, Product::class, UserEntity::class], version = 15, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
