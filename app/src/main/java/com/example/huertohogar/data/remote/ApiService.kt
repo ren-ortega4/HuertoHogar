@@ -15,7 +15,7 @@ import retrofit2.http.Path
 interface ApiService {
     // registro de usuarios
     @POST("/api/v1/usuario/guardar")
-    suspend fun registarUsusario(@Body user : User) : Response<Unit>
+    suspend fun registarUsusario(@Body user : User) : Response<User>
     //login de usuario
     @POST("/api/v1/usuario/login")
     suspend fun login(@Body loginRequest: LoginRequest) : Response<LoginResponse>

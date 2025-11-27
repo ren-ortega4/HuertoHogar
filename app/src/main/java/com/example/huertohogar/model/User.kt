@@ -23,7 +23,7 @@ data class UserEntity(
 data class User(
 
     @SerializedName("id_usuario")
-    val id: Long?,
+    val id_usuario: Long?,
 
     @SerializedName("nombre")
     val nombre: String,
@@ -58,8 +58,8 @@ data class User(
 // Convierte el modelo de red (User) a la entidad de base de datos (UserEntity).
 fun User.toEntity(): UserEntity {
     return UserEntity(
-        id = this.id ?: 0L,
-        idApi = this.id?.toInt(),
+        id = 0,
+        idApi = this.id_usuario?.toInt(),
         nombre = this.nombre,
         apellido = this.apellido,
         correo = this.correo,

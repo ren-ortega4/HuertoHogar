@@ -39,7 +39,7 @@ class UserViewModel(
         repository.activeUser.map { userEntity ->
             userEntity?.let { entity ->
                 User(
-                    id = entity.id,
+                    id_usuario = entity.id,
                     nombre = entity.nombre,
                     apellido = entity.apellido,
                     correo = entity.correo,
@@ -109,7 +109,7 @@ class UserViewModel(
 
         // El modelo User no tiene 'confirmarcontrasena'
         val userParaRegistro = User(
-            id = 0,
+            id_usuario = null,
             nombre = uiState.value.nombre,
             apellido = uiState.value.apellido,
             correo = uiState.value.correo,
@@ -180,7 +180,7 @@ class UserViewModel(
         }
         val uriString = nuevoUri?.toString()
         viewModelScope.launch{
-            repository.ActualizarFotoPerfil(usuarioActual.id?:0L ,uriString)
+            repository.ActualizarFotoPerfil(usuarioActual.id_usuario?:0L ,uriString)
         }
     }
 

@@ -8,8 +8,8 @@ import com.example.huertohogar.model.LoginRequest
 import com.example.huertohogar.model.User
 import com.example.huertohogar.model.UserEntity
 import kotlinx.coroutines.flow.Flow
-import com.example.huertohogar.model.toEntity
 import kotlinx.coroutines.flow.first
+import com.example.huertohogar.model.toEntity
 
 class UsuarioRepository(
     private val apiService: ApiService,
@@ -22,26 +22,30 @@ class UsuarioRepository(
     // función de registro mejorada con modo offline-first
     suspend fun register(user: User): Boolean {
         return try {
-            // Intentar registrar en la API
             val response = apiService.registarUsusario(user)
             if (response.isSuccessful) {
                 Log.d("UsuarioRepository", "Registro en API exitoso.")
+
+                val userFormApi: User? = response.body()
+                if (userFormApi != null) {
+                    // Guardar el usuario local con el idApi correcto
+                    val userEntity = userFormApi.toEntity().copy(estado = true)
+                    usuarioDao.upsert(userEntity)
+                    Log.d("UsuarioRepository", "Usuario guardado en BD local con idApi de la API. Estado = true")
+                    return true
+                }
             } else {
                 Log.w("UsuarioRepository", "Advertencia: Error en registro API ${response.code()}, pero se guardará localmente")
             }
-            // IMPORTANTE: Guardar en BD local SIN IMPORTAR si API falló
-            // Así funciona offline
-            // Guardar usuario con estado = false (no activo)
+            // Si la API falla, guardar usuario local con estado = false
             val userEntity = user.toEntity().copy(estado = false)
             usuarioDao.upsert(userEntity)
             Log.d("UsuarioRepository", "Usuario guardado en BD local (offline-first). NO inicia sesión automática. Estado = false")
             return true
-            
+
         } catch (e: Exception) {
             Log.w("UsuarioRepository", "API no disponible (${e.message}), guardando localmente en modo offline", e)
-            // Modo offline: guardar en BD local aunque API falle
             return try {
-                // Guardar usuario con estado = false (no activo)
                 val userEntity = user.toEntity().copy(estado = false)
                 usuarioDao.upsert(userEntity)
                 Log.d("UsuarioRepository", "Usuario guardado en BD local en modo OFFLINE. NO inicia sesión automática. Estado = false")
