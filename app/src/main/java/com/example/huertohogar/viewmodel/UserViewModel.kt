@@ -107,7 +107,7 @@ class UserViewModel(
         if (!validarFormularioRegistro()) return false
         _formState.update { it.copy(isLoading = true) }
 
-        // CORREGIDO: El modelo User no tiene 'confirmarcontrasena'
+        // El modelo User no tiene 'confirmarcontrasena'
         val userParaRegistro = User(
             id = 0,
             nombre = uiState.value.nombre,
@@ -129,6 +129,7 @@ class UserViewModel(
         return success
     }
 
+    // funcion para limpiar formulario
     fun limpiarFormulario() {
         // Resetea solo los campos del formulario, el estado de la sesión se mantiene.
         _formState.update {
@@ -137,7 +138,7 @@ class UserViewModel(
     }
 
     private fun validarLogin(): Boolean {
-        // Tu lógica de validación usando 'uiState.value.loginCorreo', etc.
+        // lógica de validación login
         val estadoActual = uiState.value
         val erroresNuevos = estadoActual.errores.copy(
             errorLoginCorreo = if (estadoActual.loginCorreo.isBlank()) "El correo es requerido" else if (!estadoActual.loginCorreo.contains("@")) "El correo debe tener '@'" else null,
@@ -152,7 +153,7 @@ class UserViewModel(
 
     fun validarFormularioRegistro(): Boolean {
         val estadoActual = uiState.value
-        // CORREGIDO: El data class UserError no tiene 'contrasena', usa 'clave'
+        //  El data class UserError no tiene 'contrasena', usa 'clave'
         val erroresNuevos = UserError(
             nombre = if (estadoActual.nombre.isBlank()) "El nombre es requerido" else null,
             apellido = if (estadoActual.apellido.isBlank()) "El apellido es requerido" else null,
@@ -169,8 +170,9 @@ class UserViewModel(
         return !hayErrores
     }
 
+    // funcion para actualizar la foto de perfil
     fun actualizarFotoPerfil(nuevoUri: Uri?) {
-        // CORREGIDO: Obtenemos el usuario de la sesión desde el estado unificado 'uiState'.
+        //  Obtenemos el usuario de la sesión desde el estado unificado
         val usuarioActual = uiState.value.currentUser
         if (usuarioActual == null) {
             Log.d(TAG, "No hay un usuario en sesión para actualizar la foto")
@@ -182,19 +184,41 @@ class UserViewModel(
         }
     }
 
+    // funcion para manejo de errores . eliminar cuenta
+    fun limpiarErrorGeneral(){
+        _formState.update {
+            it.copy(
+                errores = it.errores.copy(
+                    errorLoginGeneral = null
+                )
+            )
+        }
+    }
+    // funcion para eliminar cuenta
     fun eliminarCuenta() {
         viewModelScope.launch {
-            val userEntity = repository.activeUser.first()
-            val idApi = userEntity?.idApi
-            val idLocal = userEntity?.id
+            try {
+                val userEntity = repository.activeUser.first()
+                val idApi = userEntity?.idApi
+                val idLocal = userEntity?.id
 
-            if (idApi != null) {
-                repository.eliminarUsuarioApi(idApi)
+                if (idApi != null) {
+                    repository.eliminarUsuarioApi(idApi)
+                }
+                if (idLocal != null) {
+                    repository.eliminarUsuarioLocal(idLocal)
+                }
+                logout()
+            }catch (e:Exception){
+                _formState.update {
+                    it.copy(
+                        errores = it.errores.copy(
+                            errorLoginGeneral = "No hay conexion a internet"
+                        )
+                    )
+                }
             }
-            if (idLocal != null) {
-                repository.eliminarUsuarioLocal(idLocal)
-            }
-            logout()
+
         }
     }
 

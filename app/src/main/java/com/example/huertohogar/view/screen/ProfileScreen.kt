@@ -62,6 +62,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +81,27 @@ fun ProfileScreen(
     val currentUser = estado.currentUser
     val isDark = isSystemInDarkTheme()
 
+    var showCerrarSesionDialog by remember { mutableStateOf(false) }
+    var showEliminarCuentaDialog by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
+    var isLoggingOut by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+
+
+    //muestra error de conexion a internet por ahora solo funciona con eliminar cuenta
+    if (estado.errores.errorLoginGeneral != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.limpiarErrorGeneral() },
+            title = { Text("Error") },
+            text = { Text(estado.errores.errorLoginGeneral ?: "") },
+            confirmButton = {
+                Button(onClick = { viewModel.limpiarErrorGeneral() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     LaunchedEffect(currentUser) {
         android.util.Log.d("ProfileScreen", "currentUser = $currentUser")
@@ -230,9 +258,9 @@ fun ProfileScreen(
                             color = Color.Gray
                         )
                         Spacer(modifier = Modifier.height(32.dp))
-
+                            // boton de eliminar cuenta
                         Button(
-                            onClick = {viewModel.eliminarCuenta()},
+                            onClick = {showEliminarCuentaDialog=true},
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFD32F2F),
@@ -242,19 +270,59 @@ fun ProfileScreen(
                         ) {
                             Text("ELIMINAR CUENTA")
                         }
+                        DialogConfirmacion(
+                            show = showEliminarCuentaDialog,
+                           titulo = "Eliminar cuenta",
+                            mensaje = "¿Desea eliminar Esta Cuenta?",
+                            textoConfirmar = "Eliminar",
+                            colorConfirmar = Color(0xFFD32F2F),
+                            onConfirm = {
+                                scope.launch {
+                                    showEliminarCuentaDialog=false
+                                    isDeleting=true
+                                    delay(3000)
+                                    viewModel.eliminarCuenta()
+                                    isDeleting=false
+                                }
+                            }, onCancel = {showEliminarCuentaDialog=false}
+                        )
+                        DialogCargando(show = isDeleting, mensaje = "Eliminando Cuenta...")
 
-                        Spacer(modifier = Modifier.height(32.dp))
+
+
+
+
+                        // boton de cerrar sesión
+                        Spacer(modifier = Modifier.height(10.dp))
                         Button(
-                            onClick = { viewModel.logout() },
+                            onClick = { showCerrarSesionDialog=true },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red.copy(alpha = 0.8f),
+                                containerColor = Color(0xFFFF5722),
                                 contentColor = Color.White
                             ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text("CERRAR SESIÓN")
                         }
+
+                        DialogConfirmacion(
+                            show = showCerrarSesionDialog,
+                            titulo = "Cerrar Sesión",
+                            mensaje = "¿Desea Cerrar Sesión?",
+                            textoConfirmar = "Cerrar",
+                            colorConfirmar = Color(0xFFFF5722),
+                            onConfirm = {
+                                scope.launch {
+                                    showCerrarSesionDialog=false
+                                    isLoggingOut=true
+                                    delay(3000)
+                                    viewModel.logout()
+                                    isLoggingOut=false
+                                }
+                            }, onCancel = {showCerrarSesionDialog=false}
+                        )
+                        DialogCargando(show = isLoggingOut, mensaje = "Cerrando Sesión...")
                     }
                 }
             } else {
@@ -315,5 +383,67 @@ fun ProfileScreen(
                 }
             }
         }
+    }
+}
+
+
+// composable reutilizable para diálogos de confirmación
+@Composable
+fun DialogConfirmacion(
+    show: Boolean,
+    titulo: String,
+    mensaje: String,
+    textoConfirmar: String,
+    colorConfirmar: Color,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    if (show) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(titulo) },
+            text = { Text(mensaje) },
+            confirmButton = {
+                Button(
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorConfirmar,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(textoConfirmar)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onCancel,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+}
+
+// funcion para una carga reutilizable
+@Composable
+fun DialogCargando(show: Boolean, mensaje: String) {
+    if (show) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(mensaje) },
+            text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Por favor espera")
+                }
+            },
+            confirmButton = {}
+        )
     }
 }
