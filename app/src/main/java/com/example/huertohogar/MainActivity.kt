@@ -32,7 +32,7 @@ import com.example.huertohogar.network.ApiService
 
 class MainActivity : ComponentActivity() {
     private val db by lazy { AppDatabase.getDatabase(this) }
-    // 1. Crear la instancia del Repositorio de Usuario
+    // 1. Crear la instancia del Repositorio de Usuario Nuevo
     private val usarioDao by lazy{ AppDatabase.getDatabase(this).usuarioDao() }
     private val apiService by lazy { ApiCliente.instance }
     private val usuarioRepository by lazy {
