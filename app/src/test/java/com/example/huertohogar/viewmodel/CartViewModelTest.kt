@@ -14,16 +14,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Assertions.*
 
-/**
- * Pruebas unitarias para CartViewModel
- * 
- * Cubre:
- * - Agregar productos al carrito
- * - Remover productos del carrito
- * - Actualizar cantidades
- * - Cálculo de totales
- * - Limpiar carrito
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 @DisplayName("CartViewModel Tests")
 class CartViewModelTest {
@@ -67,15 +57,13 @@ class CartViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // ==================== PRUEBAS DE AGREGAR AL CARRITO ====================
-
     @Nested
-    @DisplayName("Add to Cart Tests")
+    @DisplayName("Test de añadir productos al carrito")
     inner class AddToCartTests {
 
         @Test
-        @DisplayName("Debe agregar un producto nuevo al carrito")
-        fun `add new product to cart`() = runTest {
+        @DisplayName("agregar un producto nuevo al carrito")
+        fun `Añadir un producto nuevo al carrito`() = runTest {
             // When
             viewModel.addToCart(testProduct1, 2)
             testScheduler.advanceUntilIdle()
@@ -120,7 +108,7 @@ class CartViewModelTest {
 
         @Test
         @DisplayName("Debe agregar con cantidad por defecto de 1")
-        fun `add product with default quantity`() = runTest {
+        fun `Debe agregar cantidad por defecto`() = runTest {
             // When
             viewModel.addToCart(testProduct1)
             testScheduler.advanceUntilIdle()

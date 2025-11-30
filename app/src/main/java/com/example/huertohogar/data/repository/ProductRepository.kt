@@ -1,6 +1,5 @@
 package com.example.huertohogar.data.repository
 
-import androidx.room.Query
 import com.example.huertohogar.R
 import com.example.huertohogar.data.local.ProductDao
 import com.example.huertohogar.model.Product

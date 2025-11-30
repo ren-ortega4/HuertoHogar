@@ -90,7 +90,7 @@ class UserViewModelTest {
         }
 
         @Test
-        fun `login con credenciales inválidas retorna false y muestra error`() = runTest {
+        fun `login con credenciales no validas retorna false y muestra error`() = runTest {
             // Given
             coEvery { mockRepository.login(any(), any()) } returns null
 
@@ -371,7 +371,7 @@ class UserViewModelTest {
         }
 
         @Test
-        fun `guardarUsuario con datos inválidos no llama al repositorio`() = runTest {
+        fun `guardarUsuario con datos no validos no llama al repositorio`() = runTest {
             // Given - datos inválidos
             viewModel.onNombreChange("")
             viewModel.onCorreoChange("invalid")
