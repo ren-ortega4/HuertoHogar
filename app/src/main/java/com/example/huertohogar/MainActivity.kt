@@ -31,6 +31,7 @@ import com.example.huertohogar.network.ApiCliente
 import com.example.huertohogar.network.ApiService
 
 class MainActivity : ComponentActivity() {
+    // Nueva Integración
     private val db by lazy { AppDatabase.getDatabase(this) }
     // 1. Crear la instancia del Repositorio de Usuario Nuevo
     private val usarioDao by lazy{ AppDatabase.getDatabase(this).usuarioDao() }
