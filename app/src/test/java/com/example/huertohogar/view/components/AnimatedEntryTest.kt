@@ -3,11 +3,6 @@ package com.example.huertohogar.view.components
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-/**
- * Nota: AnimatedEntry es un componente Composable que requiere pruebas de UI instrumentadas.
- * Estas pruebas unitarias verifican la lógica básica y los parámetros del componente.
- * Para pruebas completas de UI, mover estas pruebas a androidTest con createComposeRule.
- */
 class AnimatedEntryTest {
 
     @Test

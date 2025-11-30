@@ -33,7 +33,6 @@ class AppDatabaseTest {
         context = mockk(relaxed = true)
         every { context.applicationContext } returns context
         
-        // Clear singleton instance before each test
         clearDatabaseInstance()
     }
 
@@ -49,16 +48,16 @@ class AppDatabaseTest {
             instanceField.isAccessible = true
             instanceField.set(null, null)
         } catch (e: Exception) {
-            // Instance field might not exist or already null
+
         }
     }
 
     @Nested
-    @DisplayName("Database Instance Tests")
+    @DisplayName("Pruebas de la instancia de la base de datos")
     inner class DatabaseInstanceTests {
 
         @Test
-        @DisplayName("getDatabase should return singleton instance")
+        @DisplayName("Debe retornar la misma instancia de la base de datos")
         fun `getDatabase should return singleton instance`() {
             mockkStatic(Room::class)
             
@@ -99,7 +98,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("getDatabase should configure database correctly")
+        @DisplayName("Debe configurar la base de datos correctamente")
         fun `getDatabase should configure database correctly`() {
             mockkStatic(Room::class)
             
@@ -133,7 +132,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("getDatabase should use application context")
+        @DisplayName("Debe usar el contexto de la aplicación")
         fun `getDatabase should use application context`() {
             mockkStatic(Room::class)
             
@@ -180,7 +179,7 @@ class AppDatabaseTest {
     inner class DaoTests {
 
         @Test
-        @DisplayName("should provide TipDao instance")
+        @DisplayName("Debe retornar el DAO correspondiente")
         fun `should provide TipDao instance`() {
             val mockDatabase = mockk<AppDatabase>(relaxed = true)
             val mockTipDao = mockk<TipDao>(relaxed = true)
@@ -194,7 +193,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("should provide CategoryDao instance")
+        @DisplayName("Debe retornar el DAO correspondiente")
         fun `should provide CategoryDao instance`() {
             val mockDatabase = mockk<AppDatabase>(relaxed = true)
             val mockCategoryDao = mockk<CategoryDao>(relaxed = true)
@@ -208,7 +207,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("should provide ProductDao instance")
+        @DisplayName("Debe retornar el DAO correspondiente")
         fun `should provide ProductDao instance`() {
             val mockDatabase = mockk<AppDatabase>(relaxed = true)
             val mockProductDao = mockk<ProductDao>(relaxed = true)
@@ -222,7 +221,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("should provide UsuarioDao instance")
+        @DisplayName("Debe retornar el DAO correspondiente")
         fun `should provide UsuarioDao instance`() {
             val mockDatabase = mockk<AppDatabase>(relaxed = true)
             val mockUsuarioDao = mockk<UsuarioDao>(relaxed = true)
@@ -237,11 +236,11 @@ class AppDatabaseTest {
     }
 
     @Nested
-    @DisplayName("Database Initialization Tests")
+    @DisplayName("Pruebas de inicialización de la base de datos")
     inner class DatabaseInitializationTests {
 
         @Test
-        @DisplayName("should populate products when database is empty")
+        @DisplayName("Debe poblar la base de datos correctamente")
         fun `should populate products when database is empty`() = runBlocking {
             mockkStatic(Room::class)
             
@@ -278,7 +277,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("should populate initial user when database is empty")
+        @DisplayName("Debe poblar la base de datos con usuarios ")
         fun `should populate initial user when database is empty`() = runBlocking {
             mockkStatic(Room::class)
             
@@ -314,7 +313,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("should not populate products when database already has data")
+        @DisplayName("No debe poblar la base de datos si ya tiene datos")
         fun `should not populate products when database already has data`() = runBlocking {
             mockkStatic(Room::class)
             
@@ -356,11 +355,11 @@ class AppDatabaseTest {
     }
 
     @Nested
-    @DisplayName("populateProducts Tests")
+    @DisplayName("Pruebas de poblado de productos")
     inner class PopulateProductsTests {
 
         @Test
-        @DisplayName("populateProducts should delete all existing products")
+        @DisplayName("PopulateProducts debe eliminar todos los productos existentes")
         fun `populateProducts should delete all existing products`() = runBlocking {
             val mockProductDao = mockk<ProductDao>(relaxed = true)
             coEvery { mockProductDao.deleteAllProducts() } just Runs
@@ -372,7 +371,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateProducts should insert 6 products")
+        @DisplayName("populateProducts debe insertar 6 productos")
         fun `populateProducts should insert 6 products`() = runBlocking {
             val mockProductDao = mockk<ProductDao>(relaxed = true)
             val capturedProducts = slot<List<Product>>()
@@ -387,7 +386,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateProducts should insert correct product data")
+        @DisplayName("populateProducts debe insertar productos con datos correctos")
         fun `populateProducts should insert correct product data`() = runBlocking {
             val mockProductDao = mockk<ProductDao>(relaxed = true)
             val capturedProducts = slot<List<Product>>()
@@ -422,7 +421,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateProducts should insert products with valid categories")
+        @DisplayName("populateProducts debe insertar productos con categorías correctas")
         fun `populateProducts should insert products with valid categories`() = runBlocking {
             val mockProductDao = mockk<ProductDao>(relaxed = true)
             val capturedProducts = slot<List<Product>>()
@@ -441,11 +440,11 @@ class AppDatabaseTest {
     }
 
     @Nested
-    @DisplayName("populateInitialUser Tests")
+    @DisplayName("poblar usuarios Tests")
     inner class PopulateInitialUserTests {
 
         @Test
-        @DisplayName("populateInitialUser should insert admin user")
+        @DisplayName("populateInitialUser debe insertar el usuario administrador")
         fun `populateInitialUser should insert admin user`() = runBlocking {
             val mockUsuarioDao = mockk<UsuarioDao>(relaxed = true)
             val capturedUser = slot<User>()
@@ -459,7 +458,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateInitialUser should insert user with correct credentials")
+        @DisplayName("populateInitialUser debe insertar usuario con credenciales correctas")
         fun `populateInitialUser should insert user with correct credentials`() = runBlocking {
             val mockUsuarioDao = mockk<UsuarioDao>(relaxed = true)
             val capturedUser = slot<User>()
@@ -476,7 +475,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateInitialUser should insert user with admin address and region")
+        @DisplayName("populateInitialUser debe insertar usuario con dirección y región")
         fun `populateInitialUser should insert user with admin address and region`() = runBlocking {
             val mockUsuarioDao = mockk<UsuarioDao>(relaxed = true)
             val capturedUser = slot<User>()
@@ -491,7 +490,7 @@ class AppDatabaseTest {
         }
 
         @Test
-        @DisplayName("populateInitialUser should insert user with accepted terms")
+        @DisplayName("populateInitialUser debe insertar usuario con términos aceptados")
         fun `populateInitialUser should insert user with accepted terms`() = runBlocking {
             val mockUsuarioDao = mockk<UsuarioDao>(relaxed = true)
             val capturedUser = slot<User>()
@@ -510,7 +509,7 @@ class AppDatabaseTest {
     inner class DatabaseCallbackTests {
 
         @Test
-        @DisplayName("onCreate callback should be triggered")
+        @DisplayName("onCreate callback debe ser llamado")
         fun `onCreate callback should be triggered`() {
             val mockDb = mockk<SupportSQLiteDatabase>(relaxed = true)
             val callback = AppDatabase.Companion::class.java.declaredClasses
@@ -525,7 +524,7 @@ class AppDatabaseTest {
     inner class ThreadSafetyTests {
 
         @Test
-        @DisplayName("getInstance should be thread safe with synchronized block")
+        @DisplayName("getInstance debe ser thread safe con synchronized block")
         fun `getInstance should be thread safe with synchronized block`() {
             mockkStatic(Room::class)
             
@@ -559,11 +558,11 @@ class AppDatabaseTest {
     }
 
     @Nested
-    @DisplayName("Error Handling Tests")
+    @DisplayName("Pruebas de manejo de errores")
     inner class ErrorHandlingTests {
 
         @Test
-        @DisplayName("should handle exception during product population")
+        @DisplayName("should debe manejar excepciones durante la población de productos")
         fun `should handle exception during product population`() = runBlocking {
             mockkStatic(Room::class)
             

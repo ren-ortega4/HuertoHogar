@@ -25,7 +25,7 @@ class ConvertersTest {
     inner class FromProductCategoryTests {
 
         @Test
-        @DisplayName("should convert frutas category to String")
+        @DisplayName("debe convertir la categoría frutas a String")
         fun `should convert frutas category to String`() {
             val result = converters.fromProductCategory(ProductCategory.frutas)
 
@@ -34,7 +34,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert verduras category to String")
+        @DisplayName("debe convertir la categoría verduras a String")
         fun `should convert verduras category to String`() {
             val result = converters.fromProductCategory(ProductCategory.verduras)
 
@@ -43,7 +43,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert productosOrganicos category to String")
+        @DisplayName("debe convertir la categoría productosOrganicos a String")
         fun `should convert productosOrganicos category to String`() {
             val result = converters.fromProductCategory(ProductCategory.productosOrganicos)
 
@@ -52,7 +52,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert lacteos category to String")
+        @DisplayName("debe convertir la categoría lacteos a String")
         fun `should convert lacteos category to String`() {
             val result = converters.fromProductCategory(ProductCategory.lacteos)
 
@@ -61,7 +61,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert otros category to String")
+        @DisplayName("debe convertir la categoría otros a String")
         fun `should convert otros category to String`() {
             val result = converters.fromProductCategory(ProductCategory.otros)
 
@@ -70,7 +70,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return category enum name")
+        @DisplayName("debe devolver el nombre del enum como String")
         fun `should return category enum name`() {
             val category = ProductCategory.frutas
             val result = converters.fromProductCategory(category)
@@ -79,7 +79,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return non-empty string for any category")
+        @DisplayName("debe devolver una cadena no vacía")
         fun `should return non-empty string for any category`() {
             val categories = ProductCategory.entries
 
@@ -90,7 +90,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert all ProductCategory values")
+        @DisplayName("debe convertir todos los valores de ProductCategory a String")
         fun `should convert all ProductCategory values`() {
             val expectedResults = mapOf(
                 ProductCategory.frutas to "frutas",
@@ -107,7 +107,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return consistent results for same category")
+        @DisplayName("debe devolver el mismo resultado para la misma categoría")
         fun `should return consistent results for same category`() {
             val category = ProductCategory.frutas
             
@@ -120,7 +120,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return different strings for different categories")
+        @DisplayName("debe devolver resultados diferentes para categorías diferentes")
         fun `should return different strings for different categories`() {
             val result1 = converters.fromProductCategory(ProductCategory.frutas)
             val result2 = converters.fromProductCategory(ProductCategory.verduras)
@@ -134,7 +134,7 @@ class ConvertersTest {
     inner class ToProductCategoryTests {
 
         @Test
-        @DisplayName("should convert 'frutas' string to ProductCategory.frutas")
+        @DisplayName("debe convertir 'frutas' string a ProductCategory.frutas")
         fun `should convert frutas string to ProductCategory frutas`() {
             val result = converters.toProductCategory("frutas")
 
@@ -143,7 +143,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert 'verduras' string to ProductCategory.verduras")
+        @DisplayName("debe convertir 'verduras' string a ProductCategory.verduras")
         fun `should convert verduras string to ProductCategory verduras`() {
             val result = converters.toProductCategory("verduras")
 
@@ -152,7 +152,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert 'productosOrganicos' string to ProductCategory.productosOrganicos")
+        @DisplayName("debe convertir 'productosOrganicos' string a ProductCategory.productosOrganicos")
         fun `should convert productosOrganicos string to ProductCategory productosOrganicos`() {
             val result = converters.toProductCategory("productosOrganicos")
 
@@ -161,7 +161,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert 'lacteos' string to ProductCategory.lacteos")
+        @DisplayName("debe convertir 'lacteos' string a ProductCategory.lacteos")
         fun `should convert lacteos string to ProductCategory lacteos`() {
             val result = converters.toProductCategory("lacteos")
 
@@ -170,7 +170,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert 'otros' string to ProductCategory.otros")
+        @DisplayName("debe convertir 'otros' string a ProductCategory.otros")
         fun `should convert otros string to ProductCategory otros`() {
             val result = converters.toProductCategory("otros")
 
@@ -179,7 +179,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should throw exception for invalid category string")
+        @DisplayName("debe lanzar excepción para string inválido")
         fun `should throw exception for invalid category string`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("invalid_category")
@@ -187,7 +187,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should throw exception for empty string")
+        @DisplayName("debe lanzar excepción para string vacío")
         fun `should throw exception for empty string`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("")
@@ -195,7 +195,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should be case sensitive")
+        @DisplayName("debe lanzar excepción para string con espacios en blanco")
         fun `should be case sensitive`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("FRUTAS")
@@ -203,7 +203,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should throw exception for string with spaces")
+        @DisplayName("debe lanzar excepción para string con espacios al final")
         fun `should throw exception for string with spaces`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("frutas ")
@@ -211,7 +211,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert all valid category strings")
+        @DisplayName("debe lanzar excepción para string con espacios al inicio")
         fun `should convert all valid category strings`() {
             val validStrings = listOf(
                 "frutas",
@@ -229,7 +229,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return consistent results for same string")
+        @DisplayName("debe devolver el mismo resultado para la misma cadena")
         fun `should return consistent results for same string`() {
             val categoryString = "frutas"
             
@@ -242,7 +242,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should return different categories for different strings")
+        @DisplayName("debe devolver resultados diferentes para cadenas diferentes")
         fun `should return different categories for different strings`() {
             val result1 = converters.toProductCategory("frutas")
             val result2 = converters.toProductCategory("verduras")
@@ -256,7 +256,7 @@ class ConvertersTest {
     inner class BidirectionalConversionTests {
 
         @Test
-        @DisplayName("should convert category to string and back to same category")
+        @DisplayName("debe convertir category a string y luego volver a category")
         fun `should convert category to string and back to same category`() {
             val originalCategory = ProductCategory.frutas
             
@@ -267,7 +267,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should convert string to category and back to same string")
+        @DisplayName("debe convertir string a category y luego volver a string")
         fun `should convert string to category and back to same string`() {
             val originalString = "verduras"
             
@@ -278,7 +278,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should maintain consistency for all categories in round trip")
+        @DisplayName("debe mantener consistencia para todas las categorías en el ciclo de ida y vuelta")
         fun `should maintain consistency for all categories in round trip`() {
             val allCategories = ProductCategory.entries
 
@@ -291,7 +291,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should maintain consistency for all valid strings in round trip")
+        @DisplayName("debe mantener consistencia para todas las cadenas en el ciclo de ida y vuelta")
         fun `should maintain consistency for all valid strings in round trip`() {
             val validStrings = listOf(
                 "frutas",
@@ -310,7 +310,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("multiple round trips should produce same result")
+        @DisplayName("debe producir el mismo resultado para la misma categoría")
         fun `multiple round trips should produce same result`() {
             val originalCategory = ProductCategory.lacteos
             
@@ -330,7 +330,7 @@ class ConvertersTest {
     inner class EdgeCasesTests {
 
         @Test
-        @DisplayName("should handle ProductCategory with special characters in displayName")
+        @DisplayName("debe manejar ProductCategory con caracteres especiales en displayName")
         fun `should handle ProductCategory with special characters in displayName`() {
             // productosOrganicos has "Productos Orgánicos" as displayName
             val category = ProductCategory.productosOrganicos
@@ -341,7 +341,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("fromProductCategory should use enum name not displayName")
+        @DisplayName("debe manejar ProductCategory con nombres diferentes de displayName")
         fun `fromProductCategory should use enum name not displayName`() {
             val category = ProductCategory.frutas
             val result = converters.fromProductCategory(category)
@@ -351,7 +351,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should handle all enum entries without exception")
+        @DisplayName("debe manejar todas las entradas de ProductCategory sin excepción")
         fun `should handle all enum entries without exception`() {
             val allEntries = ProductCategory.entries
             
@@ -362,7 +362,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("toProductCategory should not accept displayName values")
+        @DisplayName("debe lanzar excepción para displayName en lugar de name")
         fun `toProductCategory should not accept displayName values`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("Frutas") // displayName instead of name
@@ -370,7 +370,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should throw exception for null-like strings")
+        @DisplayName("debe lanzar excepción para strings nulos o vacíos")
         fun `should throw exception for null-like strings`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("null")
@@ -378,7 +378,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should throw exception for numeric strings")
+        @DisplayName("debe lanzar excepción para strings que no sean números")
         fun `should throw exception for numeric strings`() {
             assertThrows<IllegalArgumentException> {
                 converters.toProductCategory("123")
@@ -391,7 +391,7 @@ class ConvertersTest {
     inner class TypeConverterFunctionalityTests {
 
         @Test
-        @DisplayName("converters should work with Room database context")
+        @DisplayName("debe funcionar correctamente con Room database context")
         fun `converters should work with Room database context`() {
             // Simulating how Room would use these converters
             val originalCategory = ProductCategory.productosOrganicos
@@ -405,7 +405,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should support all ProductCategory enum values")
+        @DisplayName("debe manejar todos los valores de ProductCategory")
         fun `should support all ProductCategory enum values`() {
             val totalCategories = ProductCategory.entries.size
             
@@ -420,7 +420,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("converter instance should be stateless")
+        @DisplayName("debe ser stateless")
         fun `converter instance should be stateless`() {
             val converter1 = Converters()
             val converter2 = Converters()
@@ -432,7 +432,7 @@ class ConvertersTest {
         }
 
         @Test
-        @DisplayName("should work correctly with different converter instances")
+        @DisplayName("Debe trabajar con diferentes instancias de Converters ")
         fun `should work correctly with different converter instances`() {
             val converter1 = Converters()
             val converter2 = Converters()

@@ -51,7 +51,7 @@ class CategoryDaoTest {
     inner class InsertAllTests {
 
         @Test
-        @DisplayName("insertAll should insert single category")
+        @DisplayName("insertAll debe insertar una categoría")
         fun `insertAll should insert single category`() = runBlocking {
             val category = createSampleCategory()
             coEvery { categoryDao.insertAll(listOf(category)) } just Runs
@@ -62,7 +62,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("insertAll should insert multiple categories")
+        @DisplayName("insertAll debe insertar múltiples categorías")
         fun `insertAll should insert multiple categories`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(id = 1, name = "Frutas"),
@@ -77,7 +77,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("insertAll should insert empty list")
+        @DisplayName("insertAll debe insertar una lista vacía")
         fun `insertAll should insert empty list`() = runBlocking {
             val emptyList = emptyList<CategoryEntity>()
             coEvery { categoryDao.insertAll(emptyList) } just Runs
@@ -88,7 +88,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("insertAll should replace on conflict")
+        @DisplayName("insertAll debe insertar categorías con datos correctos")
         fun `insertAll should replace on conflict`() = runBlocking {
             val category1 = createSampleCategory(id = 1, name = "Frutas Original")
             val category2 = createSampleCategory(id = 1, name = "Frutas Actualizado")
@@ -102,7 +102,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("insertAll should handle categories with different data")
+        @DisplayName("insertAll debe manejar categorías con datos diferentes")
         fun `insertAll should handle categories with different data`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(
@@ -131,7 +131,7 @@ class CategoryDaoTest {
     inner class GetAllCategoriesTests {
 
         @Test
-        @DisplayName("getAllCategories should return Flow of categories")
+        @DisplayName("getAllCategories debe retornar Flow de categorías")
         fun `getAllCategories should return Flow of categories`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(id = 1, name = "Frutas"),
@@ -146,7 +146,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getAllCategories should return empty list when no categories")
+        @DisplayName("getAllCategories debe retornar lista vacía si no hay categorías")
         fun `getAllCategories should return empty list when no categories`() = runBlocking {
             every { categoryDao.getAllCategories() } returns flowOf(emptyList())
 
@@ -156,7 +156,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getAllCategories should return all inserted categories")
+        @DisplayName("getAllCategories debe retornar todas las categorías insertadas")
         fun `getAllCategories should return all inserted categories`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(id = 1, name = "Frutas"),
@@ -175,7 +175,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getAllCategories should return Flow that can be collected")
+        @DisplayName("getAllCategories debe retornar Flow que puede ser recolectado")
         fun `getAllCategories should return Flow that can be collected`() = runBlocking {
             val categories = listOf(createSampleCategory())
             every { categoryDao.getAllCategories() } returns flowOf(categories)
@@ -188,7 +188,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getAllCategories should preserve category data")
+        @DisplayName("getAllCategories debe conservar datos de categoría")
         fun `getAllCategories should preserve category data`() = runBlocking {
             val category = createSampleCategory(
                 id = 10,
@@ -212,7 +212,7 @@ class CategoryDaoTest {
     inner class GetCategoryCountTests {
 
         @Test
-        @DisplayName("getCategoryCount should return zero when no categories")
+        @DisplayName("getCategoryCount debe retornar cero si no hay categorías")
         fun `getCategoryCount should return zero when no categories`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returns 0
 
@@ -222,7 +222,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getCategoryCount should return correct count for single category")
+        @DisplayName("getCategoryCount debe retornar el número de categorías")
         fun `getCategoryCount should return correct count for single category`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returns 1
 
@@ -232,7 +232,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getCategoryCount should return correct count for multiple categories")
+        @DisplayName("getCategoryCount debe retornar el número de multiples categorías")
         fun `getCategoryCount should return correct count for multiple categories`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returns 5
 
@@ -242,7 +242,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getCategoryCount should return updated count after insertion")
+        @DisplayName("getCategoryCount debe retornar el número de categorías insertadas")
         fun `getCategoryCount should return updated count after insertion`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returnsMany listOf(0, 1, 3)
 
@@ -256,7 +256,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getCategoryCount should return non-negative value")
+        @DisplayName("getCategoryCount debe retornar un valor no negativo")
         fun `getCategoryCount should return non-negative value`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returns 10
 
@@ -266,7 +266,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("getCategoryCount should handle large numbers")
+        @DisplayName("getCategoryCount debe manejar números grandes")
         fun `getCategoryCount should handle large numbers`() = runBlocking {
             coEvery { categoryDao.getCategoryCount() } returns 1000
 
@@ -281,7 +281,7 @@ class CategoryDaoTest {
     inner class IntegrationScenariosTests {
 
         @Test
-        @DisplayName("should insert and then retrieve categories")
+        @DisplayName("debe insertar y luego recuperar categorías")
         fun `should insert and then retrieve categories`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(id = 1, name = "Frutas"),
@@ -299,7 +299,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should verify count matches inserted categories")
+        @DisplayName("debe verificar que se insertaron las categorías")
         fun `should verify count matches inserted categories`() = runBlocking {
             val categories = listOf(
                 createSampleCategory(id = 1),
@@ -317,7 +317,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle insert then count scenario")
+        @DisplayName("debe manejar inserción luego de contar categorías")
         fun `should handle insert then count scenario`() = runBlocking {
             val initialCategories = listOf(
                 createSampleCategory(id = 1, name = "Cat1")
@@ -342,11 +342,11 @@ class CategoryDaoTest {
     }
 
     @Nested
-    @DisplayName("Data Validation Tests")
+    @DisplayName("Tests de Validacion de datos")
     inner class DataValidationTests {
 
         @Test
-        @DisplayName("should handle category with auto-generated id")
+        @DisplayName("debe manejar categoría con id autogenerado")
         fun `should handle category with auto-generated id`() = runBlocking {
             val category = createSampleCategory(id = 0, name = "Nueva Categoría")
             coEvery { categoryDao.insertAll(listOf(category)) } just Runs
@@ -357,7 +357,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle category with special characters in name")
+        @DisplayName("debe manejar categoría con nombre con caracteres especiales")
         fun `should handle category with special characters in name`() = runBlocking {
             val category = createSampleCategory(
                 name = "Frutas & Verduras Orgánicas 100%"
@@ -370,7 +370,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle category with empty description")
+        @DisplayName("debe manejar categoría con descripción vacía")
         fun `should handle category with empty description`() = runBlocking {
             val category = createSampleCategory(description = "")
             coEvery { categoryDao.insertAll(listOf(category)) } just Runs
@@ -381,7 +381,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle category with long description")
+        @DisplayName("debe manejar categoría con descripción muy larga")
         fun `should handle category with long description`() = runBlocking {
             val longDescription = "Esta es una descripción muy larga ".repeat(20)
             val category = createSampleCategory(description = longDescription)
@@ -398,7 +398,7 @@ class CategoryDaoTest {
     inner class EdgeCasesTests {
 
         @Test
-        @DisplayName("should handle duplicate category insertions with REPLACE strategy")
+        @DisplayName("debe manejar inserción de categorías duplicadas con REPLACE strategy")
         fun `should handle duplicate category insertions with REPLACE strategy`() = runBlocking {
             val category1 = createSampleCategory(id = 1, name = "Original")
             val category2 = createSampleCategory(id = 1, name = "Duplicado")
@@ -415,7 +415,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle categories with same name but different ids")
+        @DisplayName("debe manejar categorías con nombres iguales pero diferentes ids")
         fun `should handle categories with same name but different ids`() = runBlocking {
             val category1 = createSampleCategory(id = 1, name = "Frutas")
             val category2 = createSampleCategory(id = 2, name = "Frutas")
@@ -430,7 +430,7 @@ class CategoryDaoTest {
         }
 
         @Test
-        @DisplayName("should handle maximum integer value for id")
+        @DisplayName("debe manejar categoría con id máximo entero")
         fun `should handle maximum integer value for id`() = runBlocking {
             val category = createSampleCategory(id = Int.MAX_VALUE)
             coEvery { categoryDao.insertAll(listOf(category)) } just Runs
