@@ -13,13 +13,14 @@ import com.example.huertohogar.model.Product
 import com.example.huertohogar.model.ProductCategory
 import com.example.huertohogar.model.Tienda
 import com.example.huertohogar.model.User
+import com.example.huertohogar.model.UserEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-@Database(entities = [Tip::class, CategoryEntity::class, Product::class, User::class, Tienda::class], version = 10, exportSchema = false)
+@Database(entities = [Tip::class, CategoryEntity::class, Product::class, UserEntity::class, Tienda::class], version = 11, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -47,12 +48,8 @@ abstract class AppDatabase : RoomDatabase() {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         val currentProducts = instance.productDao().getAllProducts().first()
-                        if (currentProducts.isEmpty()){
+                        if (currentProducts.isEmpty()) {
                             populateProducts(instance.productDao())
-                        }
-                        val usuarios = instance.usuarioDao().obtenerUsuarios()
-                        if (usuarios.isEmpty()){
-                            populateInitialUser(instance.usuarioDao())
                         }
                         val tiendas = instance.tiendaDao().getAllTiendas()
                         if (tiendas.isEmpty()){
@@ -75,7 +72,6 @@ abstract class AppDatabase : RoomDatabase() {
                     CoroutineScope(Dispatchers.IO).launch {
                         // Toda la lógica de poblado se centraliza aquí
                         populateProducts(database.productDao())
-                        populateInitialUser(database.usuarioDao())
                         populateInitialTiendas(database.tiendaDao())
                     }
                 }
@@ -137,19 +133,7 @@ abstract class AppDatabase : RoomDatabase() {
             productDao.insertProducts(products)
         }
 
-        suspend fun populateInitialUser(usuarioDao: UsuarioDao){
-            usuarioDao.insertar(
-                User(
-                    nombre = "Admin",
-                    correo = "admin@gmail.com",
-                    clave = "12345678",
-                    confirmarClave = "12345678",
-                    direccion = "admin",
-                    region = "admin",
-                    aceptaTerminos = true
-                )
-            )
-        }
+
 
         suspend fun populateInitialTiendas(tiendaDao: TiendaDao){
             tiendaDao.deleteAllTiendas()

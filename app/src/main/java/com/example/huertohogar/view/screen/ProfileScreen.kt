@@ -62,6 +62,13 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,10 +76,32 @@ fun ProfileScreen(
     viewModel: UserViewModel,
     navController: NavController
 ) {
-    val estado by viewModel.estado.collectAsState()
+    val estado by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val currentUser = estado.currentUser
     val isDark = isSystemInDarkTheme()
+
+    var showCerrarSesionDialog by remember { mutableStateOf(false) }
+    var showEliminarCuentaDialog by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
+    var isLoggingOut by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+
+
+    //muestra error de conexion a internet por ahora solo funciona con eliminar cuenta
+    if (estado.errores.errorLoginGeneral != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.limpiarErrorGeneral() },
+            title = { Text("Error") },
+            text = { Text(estado.errores.errorLoginGeneral ?: "") },
+            confirmButton = {
+                Button(onClick = { viewModel.limpiarErrorGeneral() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     LaunchedEffect(currentUser) {
         android.util.Log.d("ProfileScreen", "currentUser = $currentUser")
@@ -85,10 +114,33 @@ fun ProfileScreen(
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     // --- Launchers para Galería y Cámara ---
+    // Función para copiar la imagen seleccionada a la carpeta privada
+    fun copiarImagenAGaleriaPrivada(context: Context, uri: Uri): Uri? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val nombreArchivo = "profile_${System.currentTimeMillis()}.jpg"
+            val directorio = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val archivo = java.io.File(directorio, nombreArchivo)
+            val outputStream = java.io.FileOutputStream(archivo)
+            inputStream?.copyTo(outputStream)
+            inputStream?.close()
+            outputStream.close()
+            Uri.fromFile(archivo)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { viewModel.actualizarFotoPerfil(it) }
+        uri?.let {
+            val uriPersistente = copiarImagenAGaleriaPrivada(context, it)
+            uriPersistente?.let { persistUri ->
+                viewModel.actualizarFotoPerfil(persistUri)
+            }
+        }
     }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -179,7 +231,6 @@ fun ProfileScreen(
                             Spacer(modifier = Modifier.width(16.dp))
                             Button(
                                 onClick = {
-                                    // Lógica de permisos CORREGIDA
                                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                         val uri = createImageUri(context)
                                         cameraUri = uri
@@ -207,17 +258,71 @@ fun ProfileScreen(
                             color = Color.Gray
                         )
                         Spacer(modifier = Modifier.height(32.dp))
+                        // boton de eliminar cuenta
                         Button(
-                            onClick = { viewModel.logout() },
+                            onClick = {showEliminarCuentaDialog=true},
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red.copy(alpha = 0.8f),
+                                containerColor = Color(0xFFD32F2F),
+                                contentColor= Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("ELIMINAR CUENTA")
+                        }
+                        DialogConfirmacion(
+                            show = showEliminarCuentaDialog,
+                            titulo = "Eliminar cuenta",
+                            mensaje = "¿Desea eliminar Esta Cuenta?",
+                            textoConfirmar = "Eliminar",
+                            colorConfirmar = Color(0xFFD32F2F),
+                            onConfirm = {
+                                scope.launch {
+                                    showEliminarCuentaDialog=false
+                                    isDeleting=true
+                                    delay(3000)
+                                    viewModel.eliminarCuenta()
+                                    isDeleting=false
+                                }
+                            }, onCancel = {showEliminarCuentaDialog=false}
+                        )
+                        DialogCargando(show = isDeleting, mensaje = "Eliminando Cuenta...")
+
+
+
+
+
+                        // boton de cerrar sesión
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = { showCerrarSesionDialog=true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFFF5722),
                                 contentColor = Color.White
                             ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text("CERRAR SESIÓN")
                         }
+
+                        DialogConfirmacion(
+                            show = showCerrarSesionDialog,
+                            titulo = "Cerrar Sesión",
+                            mensaje = "¿Desea Cerrar Sesión?",
+                            textoConfirmar = "Cerrar",
+                            colorConfirmar = Color(0xFFFF5722),
+                            onConfirm = {
+                                scope.launch {
+                                    showCerrarSesionDialog=false
+                                    isLoggingOut=true
+                                    delay(3000)
+                                    viewModel.logout()
+                                    isLoggingOut=false
+                                }
+                            }, onCancel = {showCerrarSesionDialog=false}
+                        )
+                        DialogCargando(show = isLoggingOut, mensaje = "Cerrando Sesión...")
                     }
                 }
             } else {
@@ -278,5 +383,67 @@ fun ProfileScreen(
                 }
             }
         }
+    }
+}
+
+
+// composable reutilizable para diálogos de confirmación
+@Composable
+fun DialogConfirmacion(
+    show: Boolean,
+    titulo: String,
+    mensaje: String,
+    textoConfirmar: String,
+    colorConfirmar: Color,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    if (show) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(titulo) },
+            text = { Text(mensaje) },
+            confirmButton = {
+                Button(
+                    onClick = onConfirm,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorConfirmar,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(textoConfirmar)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = onCancel,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+}
+
+// funcion para una carga reutilizable
+@Composable
+fun DialogCargando(show: Boolean, mensaje: String) {
+    if (show) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(mensaje) },
+            text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Por favor espera")
+                }
+            },
+            confirmButton = {}
+        )
     }
 }

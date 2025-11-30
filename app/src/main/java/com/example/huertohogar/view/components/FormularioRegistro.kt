@@ -1,18 +1,10 @@
 package com.example.huertohogar.view.components
 
 
+import android.os.Message
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,34 +13,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.huertohogar.R
 import com.example.huertohogar.viewmodel.UserViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,9 +37,19 @@ fun FormScreen(
     navController: NavController,
     viewModel: UserViewModel
 ){
+    val scope = rememberCoroutineScope()
     val isDark = isSystemInDarkTheme()
-    val estado by  viewModel.estado.collectAsState()
+    val estado by  viewModel.uiState.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    // variable para el manejo de estado
+    var showDialog by remember {  mutableStateOf(false)}
+    var dialogMessage by remember { mutableStateOf("") }
+
+    if (showDialog){
+        LoadingDialog(dialogMessage = dialogMessage)
+    }
+
 
     // esto es para que se limpie el formulario una vez que se sale de la pantalla de registro o inicio de sesion
     DisposableEffect(Unit) {
@@ -138,11 +120,25 @@ fun FormScreen(
                 OutlinedTextField(
                     value = estado.nombre,
                     onValueChange = viewModel::onNombreChange,
-                    label = { Text("Nombre Completo") },
+                    label = { Text("Nombre") },
                     leadingIcon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
                     isError = estado.errores.nombre != null,
                     supportingText = {
                         estado.errores.nombre?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // formulario de apellido
+                OutlinedTextField(
+                    value = estado.apellido,
+                    onValueChange = viewModel::onApellidoChange,
+                    label = { Text("Apellido") },
+                    leadingIcon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
+                    isError = estado.errores.apellido != null,
+                    supportingText = {
+                        estado.errores.apellido?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -162,45 +158,31 @@ fun FormScreen(
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                // formulario de clave
+                // formulario de clave (CORREGIDO)
                 OutlinedTextField(
                     value = estado.clave,
                     onValueChange = viewModel::onClaveChange,
                     label = { Text("Contraseña") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     visualTransformation = PasswordVisualTransformation(),
-                    isError = estado.errores.clave != null,
+                    isError = estado.errores.contrasena != null,
                     supportingText = {
-                        estado.errores.clave?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        estado.errores.contrasena?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
                 )
 
-                // formulario de clave confirmar
+                // formulario de clave confirmar (CORREGIDO)
                 OutlinedTextField(
                     value = estado.confirmarClave,
                     onValueChange = viewModel::onConfirmarClaveChange,
                     label = { Text("Confirmar Contraseña") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     visualTransformation = PasswordVisualTransformation(),
-                    isError = estado.errores.confirmarClave != null,
+                    isError = estado.errores.confirmarContrasena != null,
                     supportingText = {
-                        estado.errores.confirmarClave?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                // formulario de direccion
-                OutlinedTextField(
-                    value = estado.direccion,
-                    onValueChange = viewModel::onDireccionChange,
-                    label = { Text("Dirección") },
-                    leadingIcon = { Icon(Icons.Default.Place, contentDescription = null) },
-                    isError = estado.errores.direccion != null,
-                    supportingText = {
-                        estado.errores.direccion?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        estado.errores.confirmarContrasena?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp)
@@ -261,24 +243,39 @@ fun FormScreen(
                 // Botón de Registro
                 Button(
                     onClick = {
-                        if (viewModel.validarFormularioRegistro()) {
-                            viewModel.guardarUsuario()
-                            navController.navigate("InicioSesion") {
-                                popUpTo("FormularioRegistro") { inclusive = true }
+                        if (viewModel.validarFormularioRegistro()){
+                            scope.launch {
+                                // muestra el dialogo de registro
+                                dialogMessage="Guardando...."
+                                showDialog=true
+
+                                // inicia el registro con un tiempo de 3 segundos
+                                val registrojob = async { viewModel.registrarUsuario() }
+                                val delayJob = async { delay(3000) }
+
+                                // espera a que ambos terminen
+                                val registroExitoso = registrojob.await()
+                                delayJob.await()
+
+                                if (registroExitoso){
+                                    dialogMessage = "Usuario Registrado Con Exito !"
+                                    delay(1500)
+
+                                    showDialog=false
+                                    navController.navigate("InicioSesion")
+                                }else {
+                                    showDialog =false
+
+                                }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E8B57),
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                    }, modifier = Modifier.fillMaxWidth()
+
+
                 ) {
-                    Text("REGISTRARME", fontWeight = FontWeight.Bold)
+                    Text("Registar")
                 }
+
 
                 // Botón para ir a inicio de sesión
                 TextButton(onClick = { navController.navigate("InicioSesion") }) {
@@ -288,4 +285,30 @@ fun FormScreen(
         }
 
     }
+}
+@Composable
+fun LoadingDialog(dialogMessage: String){
+    AlertDialog(
+        onDismissRequest = {},
+        containerColor = Color.DarkGray,
+        title = {
+            Text(
+                "Procesando registro",
+                color = Color(0xFF2E8B57)
+            )
+        },
+        text = {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(16.dp)
+            ){
+                CircularProgressIndicator(color = Color(0xFF2E8B57))
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = dialogMessage,
+                    color = Color(0xFF2E8B57)
+                )
+            }
+        }, confirmButton = {}
+    )
 }

@@ -3,27 +3,32 @@ package com.example.huertohogar.viewmodel
 import com.example.huertohogar.model.User
 
 data class UserUiState(
-    // Estado del Usuario en sesión
+
+    // --- Estado de la Sesión ---
     val currentUser: User? = null,
+    val idApi : Int? =null,
     val isLoggedIn: Boolean = false,
+    val authToken: String? = null, // Para guardar el token JWT de la API
+    // Estado General de la UI
+    val isLoading: Boolean = false,
 
-    // Estado de Registro
-    val id : Int=0,
-    val nombre : String= "",
-    val correo : String = "",
-    val fotopefil: String?= null,
-    val clave : String = "",
+
+    // Formulario de Registro
+    val nombre: String = "",
+    val apellido: String = "",
+    val correo: String = "",
+    val clave: String = "",
     val confirmarClave: String = "",
-    val direccion : String = "",
-    val region : String = "",
-    val aceptaTerminos : Boolean = false,
+    val region: String = "",
+    val aceptaTerminos: Boolean = false,
 
-
-    // Estado del formulario de Login
+    // Formulario de Login
     val loginCorreo: String = "",
     val loginClave: String = "",
 
-    // Estado Común / OTROS
+    // --- Estado Común / Otros ---
     val recordarUsuario: Boolean = false,
-    val errores : UserError = UserError()
+
+    val registroExitoso: Boolean = false,
+    val errores: UserError = UserError()
 )

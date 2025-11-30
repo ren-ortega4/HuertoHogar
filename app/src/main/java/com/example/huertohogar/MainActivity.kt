@@ -27,11 +27,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.huertohogar.network.ApiCliente
+import com.example.huertohogar.network.ApiService
 
 class MainActivity : ComponentActivity() {
     private val db by lazy { AppDatabase.getDatabase(this) }
     // 1. Crear la instancia del Repositorio de Usuario
-    private val usuarioRepository by lazy { UsuarioRepository(db.usuarioDao()) }
+    private val usarioDao by lazy{ AppDatabase.getDatabase(this).usuarioDao() }
+    private val apiService by lazy { ApiCliente.instance }
+    private val usuarioRepository by lazy {
+        UsuarioRepository(apiService = apiService, usuarioDao = usarioDao) }
     // 2. Pasar el Repositorio a la Fábrica, no el Dao directamente
     private val userViewModelFactory by lazy { UserViewModelFactory(usuarioRepository) }
     private val storeViewModelFactory by lazy { StoreViewModelFactory(db.tiendaDao()) }
