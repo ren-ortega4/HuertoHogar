@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AgentMigrationStateService">
+    <option name="pendingSessionIds">
+      <option value="0079d81a-c6c6-4627-8f70-6b11c0439195" />
+    </option>
+    <option name="pendingTurns">
+      <map>
+        <entry key="0079d81a-c6c6-4627-8f70-6b11c0439195">
+          <value>
+            <set>
+              <option value="f2598c26-095d-419f-8ec7-abf417db6813" />
+              <option value="2360ccb5-5a02-4691-9150-474a39ef76f1" />
+              <option value="cde0af19-a57f-48fd-80a4-392f7f58b1d5" />
+              <option value="21f00022-d096-425f-8609-b7861e10dfe9" />
+              <option value="80533a2e-18e5-435b-959b-a7ea2d1a7b85" />
+              <option value="1c8d74b1-184e-4540-b8e2-c5655ce09ab1" />
+              <option value="c5da1d5d-9175-4d29-ba61-8ad1c491e88a" />
+              <option value="86eb7678-106f-4b3a-b27c-bacccc942456" />
+              <option value="e7f64b34-d39f-4054-839c-1b5bdc33c284" />
+              <option value="ebd7aa16-2940-401f-be5b-c389f019db4c" />
+              <option value="edb50673-88ca-4a66-a488-7ec35803d3be" />
+              <option value="e0517851-dc88-49a8-9d11-9eb05cb04f88" />
+              <option value="99bacfdc-a3e8-4cc6-be58-e119aa267246" />
+              <option value="ac1ec298-e1a6-4989-a0ae-655230e7a0b3" />
+              <option value="449ffdda-526d-4c26-ad53-ead6ea503102" />
+              <option value="b458e07f-666c-47d5-a17b-79fb7b5e0afe" />
+            </set>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <pendingWorkingSetItems>
+      <entry key="0079d81a-c6c6-4627-8f70-6b11c0439195">
+        <set>
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/UserTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/TipTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/TiendaTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/ProductTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/PreferenceResponseTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/NotificacionTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/LoginResponseTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/LoginRequestTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/CategoryEntityTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/CartRequestTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/CartItemTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/model/UserEntityTest.kt" />
+        </set>
+      </entry>
+    </pendingWorkingSetItems>
+  </component>
+</project>
