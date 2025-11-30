@@ -30,7 +30,7 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
                     .fillMaxWidth()
             )
             Text(product.name, modifier = Modifier.padding(top = 8.dp))
-            Text(product.price, modifier = Modifier.padding(bottom = 8.dp))
+            Text(product.priceLabel, modifier = Modifier.padding(bottom = 8.dp))
         }
     }
 }
@@ -45,7 +45,7 @@ fun FeaturedProductsRow(
         contentPadding = PaddingValues(horizontal = 4.dp)
     ) {
         items(products){
-            product -> ProductCard(product = product, onClick = { onProductClick(product)})
+                product -> ProductCard(product = product, onClick = { onProductClick(product)})
         }
     }
 }

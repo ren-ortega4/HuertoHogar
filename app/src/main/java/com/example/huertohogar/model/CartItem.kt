@@ -6,7 +6,7 @@ data class CartItem(
 ) {
     val subtotal: Double
         get() {
-            val priceString = product.price
+            val priceString = product.priceLabel
                 .replace("$", "")
                 .replace(".", "")
                 .split("/")[0] // Por si tiene /Kg o /bolsa

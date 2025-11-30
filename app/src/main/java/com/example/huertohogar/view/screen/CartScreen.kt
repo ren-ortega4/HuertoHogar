@@ -1,5 +1,6 @@
 package com.example.huertohogar.view.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -8,18 +9,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,16 +30,78 @@ import com.example.huertohogar.model.CartItem
 import com.example.huertohogar.viewmodel.CartViewModel
 import java.text.NumberFormat
 import java.util.Locale
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
+import com.example.huertohogar.model.CartRequest
+import com.example.huertohogar.model.Item
+import com.example.huertohogar.model.PreferenceResponse
+import com.example.huertohogar.network.RetrofitInstance
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun CartScreen(
     modifier: Modifier = Modifier,
-    viewModel: CartViewModel
+    viewModel: CartViewModel,
+    showSuccessBanner: Boolean = false
 ) {
     val cartItems by viewModel.cartItems.collectAsState()
     val totalPrice by viewModel.totalPrice.collectAsState()
     val isDark = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
+
+    var isLoading by remember { mutableStateOf(false) }
+    var initPoint by remember { mutableStateOf("") }
+    var bannerVisible by remember { mutableStateOf(showSuccessBanner) }
+
+    LaunchedEffect(showSuccessBanner) {
+        if (showSuccessBanner){
+            bannerVisible = true
+            viewModel.clearCart()
+            // Oculta luego de 3 segundos
+            kotlinx.coroutines.delay(3000)
+            bannerVisible = false
+        }
+    }
+
+
+    val context = LocalContext.current
+
+    fun requestPreferenceAndPay() {
+        isLoading = true
+        val items = cartItems.map {
+            Item(
+                title = it.product.name,
+                quantity = it.quantity,
+                unitPrice = it.product.price
+            )
+        }
+        val cartRequest = CartRequest(items = items)
+
+        RetrofitInstance.mercadoPagoApi.createPreference(cartRequest)
+            .enqueue(object : Callback<PreferenceResponse> {
+                override fun onResponse(
+                    call: Call<PreferenceResponse>,
+                    response: Response<PreferenceResponse>
+                ) {
+                    isLoading = false
+                    if (response.isSuccessful && response.body() != null) {
+                        initPoint = response.body()!!.init_point
+                        // ¡Lanza el CustomTab!
+                        val intent = CustomTabsIntent.Builder().build()
+                        intent.launchUrl(context, Uri.parse(initPoint))
+                    } else {
+                        Toast.makeText(context, "Error obteniendo link de pago", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<PreferenceResponse>, t: Throwable) {
+                    isLoading = false
+                    Toast.makeText(context, "Error de red: ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            })
+    }
 
     Box(
         modifier = modifier
@@ -60,7 +122,23 @@ fun CartScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Header
+            if (bannerVisible) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF4CAF50))
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "¡Gracias por tu compra!",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+            }
             Text(
                 text = "Mi Carrito",
                 style = MaterialTheme.typography.headlineMedium,
@@ -81,76 +159,32 @@ fun CartScreen(
                         CartItemCard(
                             cartItem = cartItem,
                             onIncreaseQuantity = {
-                                viewModel.updateQuantity(
-                                    cartItem.product.id,
-                                    cartItem.quantity + 1
-                                )
+                                viewModel.updateQuantity(cartItem.product.id, cartItem.quantity + 1)
                             },
                             onDecreaseQuantity = {
-                                viewModel.updateQuantity(
-                                    cartItem.product.id,
-                                    cartItem.quantity - 1
-                                )
+                                viewModel.updateQuantity(cartItem.product.id, cartItem.quantity - 1)
                             },
                             onRemove = {
                                 viewModel.removeFromCart(cartItem.product.id)
                             }
                         )
                     }
-
-                    // Espacio adicional al final
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+                    item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
 
                 // Total y botón de compra
                 TotalSection(
                     totalPrice = totalPrice,
                     onCheckout = {
-                        // Aquí iría la lógica de checkout
-                        println("Proceder al pago: ${formatPrice(totalPrice)}")
+                        requestPreferenceAndPay()
                     },
-                    onClearCart = {
-                        viewModel.clearCart()
-                    }
+                    onClearCart = { viewModel.clearCart() }
                 )
             }
         }
     }
 }
 
-@Composable
-fun EmptyCartView() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.ShoppingCart,
-            contentDescription = "Carrito vacío",
-            modifier = Modifier.size(120.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Tu carrito está vacío",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Agrega productos para comenzar tu compra",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-            textAlign = TextAlign.Center
-        )
-    }
-}
 
 @Composable
 fun CartItemCard(
@@ -203,7 +237,7 @@ fun CartItemCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = cartItem.product.price,
+                    text = cartItem.product.priceLabel,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
@@ -278,6 +312,7 @@ fun CartItemCard(
     }
 }
 
+
 @Composable
 fun TotalSection(
     totalPrice: Double,
@@ -288,14 +323,10 @@ fun TotalSection(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -315,17 +346,11 @@ fun TotalSection(
                     fontSize = 24.sp
                 )
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Button(
                 onClick = onCheckout,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E8B57)
-                ),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
@@ -334,18 +359,12 @@ fun TotalSection(
                     fontWeight = FontWeight.Bold
                 )
             }
-
             Spacer(modifier = Modifier.height(8.dp))
-
             OutlinedButton(
                 onClick = onClearCart,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(45.dp),
+                modifier = Modifier.fillMaxWidth().height(45.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.Red.copy(alpha = 0.7f)
-                )
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red.copy(alpha = 0.7f))
             ) {
                 Text(
                     text = "Vaciar Carrito",
@@ -354,6 +373,37 @@ fun TotalSection(
                 )
             }
         }
+    }
+}
+@Composable
+fun EmptyCartView() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = "Carrito vacío",
+            modifier = Modifier.size(120.dp),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Tu carrito está vacío",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Agrega productos para comenzar tu compra",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

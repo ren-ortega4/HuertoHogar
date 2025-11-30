@@ -2,13 +2,16 @@
 <resources>
 
     <style name="Theme.HuertoHogar" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Color de fondo para la ventana de inicio -->
+        <item name="android:windowBackground">@color/splash_green_bg</item>
     </style>
 
-    <!-- Fallback launcher theme para < API 31 (usa windowBackground) -->
-    <style name="Theme.HuertoHogar.Launcher" parent="Theme.HuertoHogar">
-        <item name="android:windowBackground">@color/green</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
+    <!-- Tema de la splash screen (ya no se usa activamente, pero se deja por si acaso) -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_huerto_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_huerto_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.HuertoHogar</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
     </style>
 
 </resources>

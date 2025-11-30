@@ -67,21 +67,24 @@ class ProductRepository(private val productDao: ProductDao) {
                 Product(
                     id = 1,
                     name = "Leche Natural",
-                    price = "$3.800",
+                    priceLabel = "$3.800",
+                    price = 3800.0,
                     imagesRes = R.drawable.destacado2,
                     category = ProductCategory.lacteos
                 ),
                 Product(
                     id = 2,
                     name = "Miel Orgánica",
-                    price = "$5.000",
+                    priceLabel = "$5.000",
+                    price = 5000.0,
                     imagesRes = R.drawable.destacado1,
                     category = ProductCategory.productosOrganicos
                 ),
                 Product(
                     id = 3,
                     name = "Platános Cavendish",
-                    price = "$800/Kg",
+                    priceLabel = "$800/Kg",
+                    price = 800.0,
                     imagesRes = R.drawable.destacado3,
                     category = ProductCategory.frutas
                 )

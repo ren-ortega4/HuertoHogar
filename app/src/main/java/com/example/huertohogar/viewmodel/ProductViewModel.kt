@@ -19,27 +19,27 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductViewModel(application: Application) : AndroidViewModel(application) {
-    
+
     private val repository: ProductRepository
 
     val allProducts: StateFlow<List<Product>>
 
     val allCategories: StateFlow<List<ProductCategory>>
-    
+
     private val _selectedCategory = MutableStateFlow<ProductCategory?>(null)
     val selectedCategory: StateFlow<ProductCategory?> = _selectedCategory.asStateFlow()
-    
+
     private val _productsByCategory = MutableStateFlow<List<Product>>(emptyList())
     val productsByCategory: StateFlow<List<Product>> = _productsByCategory.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-    
+
     init {
         val productDao = AppDatabase.getDatabase(application).productDao()
         repository = ProductRepository(productDao)
 
-         allProducts = _searchQuery
+        allProducts = _searchQuery
             .flatMapLatest { query ->
                 if (query.isBlank()){
                     repository.getAllProducts()
@@ -78,25 +78,25 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
-    
+
     fun insertProduct(product: Product) {
         viewModelScope.launch {
             repository.insertProduct(product)
         }
     }
-    
+
     fun updateProduct(product: Product) {
         viewModelScope.launch {
             repository.updateProduct(product)
         }
     }
-    
+
     fun deleteProduct(product: Product) {
         viewModelScope.launch {
             repository.deleteProduct(product)
         }
     }
-    
+
     suspend fun getProductById(productId: Int): Product? {
         return repository.getProductById(productId)
     }

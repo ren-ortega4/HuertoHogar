@@ -12,6 +12,9 @@
 #   public *;
 #}
 
+# Mercado Pago SDK - evitar obfuscación
+-keep class com.mercadopago.** { *; }
+
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

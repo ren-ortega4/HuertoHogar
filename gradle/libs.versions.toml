@@ -7,9 +7,11 @@ junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
-composeBom = "2024.09.00"
+composeBom = "2024.12.01"
 navigationCompose = "2.9.5"
 playServicesAnalyticsImpl = "18.2.0"
+mercadoPagoSdkBomVersion = "2024.12.01"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +30,9 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 play-services-analytics-impl = { group = "com.google.android.gms", name = "play-services-analytics-impl", version.ref = "playServicesAnalyticsImpl" }
+mercadopago-sdk-bom = { group = "com.mercadopago.android.sdk", name = "sdk-android-bom", version.ref = "mercadoPagoSdkBomVersion" }
+mercadopago-sdk-coreMethods = { group = "com.mercadopago.android.sdk", name = "core-methods" }
+mercadopago-px-checkout = { group = "com.mercadopago.android.px", name = "checkout", version = "4.52.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
