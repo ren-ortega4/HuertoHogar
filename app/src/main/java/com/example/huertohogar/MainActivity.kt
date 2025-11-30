@@ -68,28 +68,20 @@ class MainActivity : ComponentActivity() {
         val isDeepLinkToCongrats = intent?.data?.host == "congrats"
         Log.d("DEEP", "isDeepLinkToCongrats: $isDeepLinkToCongrats")
 
+
         setContent {
             HuertoHogarTheme { // El tema ahora se resolverá correctamente
                 var showLottieSplash by remember { mutableStateOf(true) }
-                var shouldAutoNavigateCart by remember { mutableStateOf(isDeepLinkToCongrats) }
+                var deepLinkHandled by remember { mutableStateOf(false) }
 
                 if (showLottieSplash) {
                     LottieSplashScreen(
                         onAnimationFinished = { showLottieSplash = false }
                     )
                 } else {
-
                     // Main App Content
                     val navController = rememberNavController()
-                    val alreadyNavigated = remember { mutableStateOf(false) }
-                    LaunchedEffect(showLottieSplash, shouldAutoNavigateCart) {
-                        if (!showLottieSplash && shouldAutoNavigateCart && !alreadyNavigated.value) {
-                            navController.navigate("cart?success=true") {
-                                popUpTo(Screen.Home.route)
-                            }
-                            alreadyNavigated.value = true
-                        }
-                    }
+
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -99,6 +91,16 @@ class MainActivity : ComponentActivity() {
                     val userViewModel: UserViewModel = viewModel(factory = userViewModelFactory)
                     val storeViewModel: StoreViewModel = viewModel(factory = storeViewModelFactory)
 
+                    if (isDeepLinkToCongrats && !deepLinkHandled) {
+                        LaunchedEffect(Unit) {
+                            cartViewModel.onPurchaseSuccess()
+                            navController.navigate(Screen.Cart.route) {
+                                popUpTo(Screen.Home.route)
+                            }
+                            deepLinkHandled = true
+                        }
+                    }
+
                     val notifs by notificacionesViewModel.notificaciones.collectAsState(initial = emptyList())
                     val notificacionesNoLeidas = notifs.count { !it.leido }
                     val cartCount by cartViewModel.totalItems.collectAsState()
@@ -106,7 +108,6 @@ class MainActivity : ComponentActivity() {
 
                     val showTopBar = currentRoute !in listOf("FormularioRegistro", "InicioSesion", "MapScreen", Screen.Account.route)
                     val showBottomBar = currentRoute !in listOf("FormularioRegistro", "InicioSesion")
-
 
 
                     Scaffold(
@@ -141,18 +142,8 @@ class MainActivity : ComponentActivity() {
                             composable(Screen.Home.route) {
                                 HomeContentScreen(onNavigateToProducts = { navController.navigate(Screen.Product.route) })
                             }
-                            composable(
-                                route = "cart?success={success}",
-                                arguments = listOf(
-                                    navArgument("success"){
-                                        type = NavType.BoolType
-                                        defaultValue = false
-                                    }
-                                )
-                            ) { backStackEntry ->
-                                val showSuccessBanner = backStackEntry.arguments?.getBoolean("success") ?: false
-                                Log.d("DEEP", "CartScreen: showSuccessBanner=$showSuccessBanner")
-                                CartScreen(viewModel = cartViewModel, showSuccessBanner = showSuccessBanner)
+                            composable(Screen.Cart.route) {
+                                CartScreen(viewModel = cartViewModel, navController = navController)
                             }
                             composable(Screen.Account.route) {
                                 ProfileScreen(viewModel = userViewModel, navController = navController)

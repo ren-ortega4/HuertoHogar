@@ -32,6 +32,7 @@ import java.text.NumberFormat
 import java.util.Locale
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.navigation.NavController
 import com.example.huertohogar.model.CartRequest
 import com.example.huertohogar.model.Item
 import com.example.huertohogar.model.PreferenceResponse
@@ -44,27 +45,17 @@ import retrofit2.Response
 fun CartScreen(
     modifier: Modifier = Modifier,
     viewModel: CartViewModel,
-    showSuccessBanner: Boolean = false
+    navController: NavController
 ) {
     val cartItems by viewModel.cartItems.collectAsState()
     val totalPrice by viewModel.totalPrice.collectAsState()
+    val bannerVisible by viewModel.showSuccessBanner.collectAsState()
+
     val isDark = isSystemInDarkTheme()
     val backgroundColor = MaterialTheme.colorScheme.background
 
     var isLoading by remember { mutableStateOf(false) }
     var initPoint by remember { mutableStateOf("") }
-    var bannerVisible by remember { mutableStateOf(showSuccessBanner) }
-
-    LaunchedEffect(showSuccessBanner) {
-        if (showSuccessBanner){
-            bannerVisible = true
-            viewModel.clearCart()
-            // Oculta luego de 3 segundos
-            kotlinx.coroutines.delay(3000)
-            bannerVisible = false
-        }
-    }
-
 
     val context = LocalContext.current
 
@@ -88,7 +79,6 @@ fun CartScreen(
                     isLoading = false
                     if (response.isSuccessful && response.body() != null) {
                         initPoint = response.body()!!.init_point
-                        // ¡Lanza el CustomTab!
                         val intent = CustomTabsIntent.Builder().build()
                         intent.launchUrl(context, Uri.parse(initPoint))
                     } else {
@@ -137,7 +127,6 @@ fun CartScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
-                Spacer(Modifier.height(16.dp))
             }
             Text(
                 text = "Mi Carrito",
@@ -172,12 +161,9 @@ fun CartScreen(
                     item { Spacer(modifier = Modifier.height(8.dp)) }
                 }
 
-                // Total y botón de compra
                 TotalSection(
                     totalPrice = totalPrice,
-                    onCheckout = {
-                        requestPreferenceAndPay()
-                    },
+                    onCheckout = ::requestPreferenceAndPay,
                     onClearCart = { viewModel.clearCart() }
                 )
             }
@@ -207,7 +193,6 @@ fun CartItemCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Imagen del producto
             Card(
                 modifier = Modifier.size(80.dp),
                 shape = RoundedCornerShape(8.dp),
@@ -225,7 +210,6 @@ fun CartItemCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Información del producto
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -253,12 +237,10 @@ fun CartItemCard(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Controles de cantidad
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // Cantidad
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -294,7 +276,6 @@ fun CartItemCard(
                         )
                     }
                 }
-                // Botón eliminar
                 IconButton(
                     onClick = onRemove,
                     modifier = Modifier.size(32.dp)
