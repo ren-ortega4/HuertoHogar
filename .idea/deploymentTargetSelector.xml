@@ -13,7 +13,7 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="MainActivity">
+      <SelectionState runConfigName="Tests in 'com.example.huertohogar'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
