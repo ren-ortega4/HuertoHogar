@@ -100,6 +100,16 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+    implementation(platform("com.mercadopago.android.sdk:sdk-android-bom:0.1.3"))
+    implementation("com.mercadopago.android.sdk:core-methods")
+    implementation("com.mercadopago.android.px:checkout:4.53.2")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.browser:browser:1.4.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.auth0.android:jwtdecode:2.0.2")
 
     //Obligatorio para usar JUnit 5
     tasks.withType<Test>().configureEach {
