@@ -5,9 +5,27 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+// Cargar propiedades del keystore
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = java.util.Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.huertohogar"
     compileSdk = 36
+    
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.huertohogar"
@@ -25,11 +43,17 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
         }
     }
     compileOptions {
@@ -42,11 +66,80 @@ android {
     buildFeatures {
         compose = true
     }
+    
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
+    }
+    
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+    }
 }
+
 kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+}
+
+// Configuración de JaCoCo para cobertura de código
+apply(plugin = "jacoco")
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+    
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*\$ViewInjector*.*",
+        "**/*\$ViewBinder*.*",
+        "**/databinding/*",
+        "**/android/databinding/*",
+        "**/androidx/databinding/*",
+        "**/di/module/*",
+        "**/*MapperImpl*.*",
+        "**/*\$Lambda$*.*",
+        "**/*Companion*.*",
+        "**/*Module*.*",
+        "**/*Dagger*.*",
+        "**/*Hilt*.*",
+        "**/*MembersInjector*.*",
+        "**/*_Factory*.*",
+        "**/*_Provide*Factory*.*",
+        "**/*Extensions*.*"
+    )
+    
+    val javaTree = fileTree("${layout.buildDirectory.get()}/intermediates/javac/debug/classes") {
+        exclude(fileFilter)
+    }
+    val kotlinTree = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    
+    classDirectories.setFrom(files(listOf(javaTree, kotlinTree)))
+    
+    val sourceDirs = listOf(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
+    
+    sourceDirectories.setFrom(files(sourceDirs))
+    executionData.setFrom(files("${layout.buildDirectory.get()}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"))
 }
 
 dependencies {
@@ -57,12 +150,16 @@ dependencies {
 
     //JUnit 5
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    
+    //JUnit 4 (para compatibilidad con coroutines-test)
+    testImplementation("junit:junit:4.13.2")
 
     //MockK
     testImplementation("io.mockk:mockk:1.13.10")
 
     //Coroutines Test
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
     //Compose UI Test
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
@@ -110,10 +207,12 @@ dependencies {
     implementation("androidx.browser:browser:1.4.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.auth0.android:jwtdecode:2.0.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
-    //Obligatorio para usar JUnit 5
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
+    //Obligatorio para usar JUnit 5 - Comentado para usar JUnit 4 en StoreViewModelTest
+    //tasks.withType<Test>().configureEach {
+    //    useJUnitPlatform()
+    //}
 
 }
