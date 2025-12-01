@@ -8,9 +8,6 @@
       <SelectionState runConfigName="HomeContentScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProductByCategoryScreenTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="NotificacionesScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

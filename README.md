@@ -1,98 +1,475 @@
-# HuertoHogar - App de E-commerce para Android
+# HuertoHogar - App de E-commerce para Android 🌱
 
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-purple.svg)](https://kotlinlang.org)
+[![Compose](https://img.shields.io/badge/Jetpack%20Compose-1.5.0-green.svg)](https://developer.android.com/jetpack/compose)
+[![Room](https://img.shields.io/badge/Room-2.6.1-blue.svg)](https://developer.android.com/jetpack/androidx/releases/room)
 
-## Descripción del Proyecto
+## 📋 Descripción del Proyecto
 
-**HuertoHogar** es una aplicación móvil nativa para Android, desarrollada con tecnologías modernas como **Jetpack Compose** y el patrón de arquitectura **MVVM**.  
-El proyecto simula una **tienda en línea (e-commerce)** de productos frescos y orgánicos, ofreciendo a los usuarios una experiencia de compra **fluida, atractiva e intuitiva**.
+**HuertoHogar** es una aplicación móvil nativa para Android que simula una **tienda en línea (e-commerce)** de productos frescos y orgánicos. Desarrollada con **Jetpack Compose** y arquitectura **MVVM**, la aplicación ofrece una experiencia de compra completa, moderna e intuitiva.
 
-La aplicación permite:
-- Registro e inicio de sesión de usuarios.
-- Exploración de un catálogo de productos clasificados por categorías.
-- Búsqueda avanzada de productos.
-- Gestión de perfil personal.
-
-El diseño se centra en ofrecer una **experiencia de usuario (UX)** moderna, coherente y visualmente limpia.
+### Características Principales
+- 🛒 Sistema completo de carrito de compras
+- 💳 Integración con MercadoPago para pagos
+- 🗄️ Persistencia de datos con Room Database
+- 🔐 Sistema de autenticación con API REST
+- 🗺️ Visualización de tiendas en mapa interactivo
+- 🔔 Sistema de notificaciones
+- 🎨 Tema claro y oscuro
+- 📱 Diseño responsive y moderno
 
 ---
 
-## Autores
+## 👥 Autores
 
 Este proyecto fue desarrollado por:
 
-- [Angel Prado]
-- [Danilo Quiroz]
-- [Renato Ortega]
+- **Angel Prado**
+- **Danilo Quiroz**
+- **Renato Ortega**
 
 ---
 
-## Funcionalidades Implementadas
+## ✨ Funcionalidades Implementadas
 
-### Autenticación de Usuarios
-- **Registro de Nuevos Usuarios:**  
-  Formulario con validación en tiempo real (nombre, correo, contraseña, dirección, etc.).
-- **Inicio de Sesión:**  
-  Acceso mediante credenciales de usuario registradas.
-- **Gestión de Perfil:**  
-  Visualización de información personal y opción de cerrar sesión.
+### 🔐 Autenticación y Gestión de Usuarios
+- **Registro de Usuarios:**
+  - Formulario completo con validación en tiempo real
+  - Campos: nombre, correo, contraseña, teléfono, dirección, etc.
+  - Integración con API REST para registro remoto
+  - Almacenamiento local con Room Database
+  
+- **Inicio de Sesión:**
+  - Autenticación mediante API REST
+  - Validación de credenciales
+  - Manejo de tokens JWT
+  - Persistencia de sesión con DataStore
+  
+- **Gestión de Perfil:**
+  - Visualización de información del usuario
+  - Edición de datos personales
+  - Opción de cerrar sesión
+  - Sincronización con backend
 
-### Navegación Intuitiva
-- **Barra de Navegación Inferior (Footer):**  
-  Permite cambiar entre las secciones principales (Inicio, Tienda, Carrito, Perfil).
-- **Navegación Condicional:**  
-  La barra se oculta automáticamente en pantallas secundarias (Login, Registro).
+### 🏪 Catálogo de Productos
+- **Base de Datos Local (Room):**
+  - Persistencia de productos con SQLite
+  - 5 categorías: Frutas, Verduras, Lácteos, Productos Orgánicos, Otros
+  - Operaciones CRUD completas
+  - Sincronización automática
+  
+- **Vista por Categorías:**
+  - Filtrado dinámico por categoría
+  - Tarjetas visuales con iconos representativos
+  - Selección interactiva de categorías
+  
+- **Búsqueda de Productos:**
+  - Búsqueda en tiempo real
+  - Filtrado por nombre
+  - Resultados instantáneos
+  - Integración con barra superior
 
-### Pantalla de Inicio (HomeScreen)
-- **Barra de Búsqueda Funcional:**  
-  Permite buscar productos por nombre en todo el catálogo.
-- **Secciones Dinámicas:**  
-  Muestra productos destacados y categorías.
-- **Llamadas a la Acción (CTA):**  
-  Tarjetas visuales que invitan al usuario a explorar el catálogo completo.
+- **Detalles de Producto:**
+  - Imágenes de alta calidad
+  - Información detallada (nombre, precio, categoría)
+  - Selector de cantidad
+  - Botón de agregar al carrito
+  - Función de compartir producto
 
-### Catálogo de Productos (ProductsScreen)
-- **Vista por Categorías:**  
-  Categorías presentadas en cuadrícula con íconos representativos.
-- **Cuadrícula de Productos:**  
-  Visualización de productos en formato de 2 columnas.
-- **Resultados de Búsqueda:**  
-  Reutiliza la misma vista para mostrar resultados filtrados.
-- **Diseño Adaptativo:**  
-  Usa `LazyVerticalGrid` para un scroll fluido y eficiente.
+### 🛒 Carrito de Compras
+- **Gestión Completa:**
+  - Agregar/eliminar productos
+  - Modificar cantidades
+  - Cálculo automático de subtotales y total
+  - Persistencia en memoria durante la sesión
+  
+- **Interfaz Intuitiva:**
+  - Vista en lista con imágenes
+  - Controles de cantidad (+/-)
+  - Botón de eliminar por producto
+  - Banner de confirmación de compra exitosa
+  
+- **Integración con MercadoPago:**
+  - Generación de preferencias de pago
+  - Checkout mediante Custom Tabs
+  - Manejo de deep links para respuesta de pago
+  - Confirmación visual de transacción
 
-### Diseño y Experiencia de Usuario (UI/UX)
-- **Interfaz Moderna con Jetpack Compose:**  
-  Toda la UI está construida de forma declarativa.
-- **Tema Oscuro y Claro:**  
-  Adaptación automática al tema del sistema.
-- **Diseño Inmersivo:**  
-  Pantallas de login y registro con fondos personalizados y tarjetas semitransparentes.
+### 🏠 Pantalla Principal (Home)
+- **Splash Screen Animado:**
+  - Animación Lottie de bienvenida
+  - Transición suave a la app
+  
+- **Consejos del Día (Tips):**
+  - Rotación automática cada 5 segundos
+  - Consejos sobre agricultura urbana
+  - Almacenamiento en Room Database
+  
+- **Productos Destacados:**
+  - Carrusel horizontal de productos
+  - Navegación fluida
+  - Click para ver detalles
+  
+- **Categorías Visuales:**
+  - Tarjetas interactivas
+  - Diálogos con información detallada
+  - Imágenes representativas
+
+### 🗺️ Mapa de Tiendas
+- **Visualización Geográfica:**
+  - Integración con OSMDroid (OpenStreetMap)
+  - Marcadores de tiendas
+  - Información al hacer click
+  - Zoom y navegación del mapa
+  
+- **Gestión de Tiendas:**
+  - Almacenamiento en Room Database
+  - Datos pre-cargados de tiendas
+  - Coordenadas geográficas precisas
+
+### 🔔 Sistema de Notificaciones
+- **Centro de Notificaciones:**
+  - Vista de notificaciones no leídas
+  - Indicador visual en barra superior
+  - Marca de leído/no leído
+  - Almacenamiento persistente
+  
+- **Tipos de Notificaciones:**
+  - Ofertas especiales
+  - Nuevos productos
+  - Actualizaciones de pedidos
+
+### 🎨 Diseño y Experiencia de Usuario (UI/UX)
+- **Jetpack Compose Moderno:**
+  - Interfaz 100% declarativa
+  - Componentes reutilizables
+  - Animaciones fluidas
+  
+- **Tema Adaptativo:**
+  - Modo claro y oscuro
+  - Detección automática del sistema
+  - Paleta de colores coherente
+  
+- **Navegación:**
+  - Bottom Navigation Bar
+  - Top App Bar con búsqueda
+  - Navegación condicional (oculta en login/registro)
+  - Transiciones suaves entre pantallas
+  
+- **Animaciones:**
+  - Entrada progresiva de elementos (AnimatedEntry)
+  - Transiciones de pantalla
+  - Efectos visuales al agregar al carrito
+  - Splash screen con Lottie
 
 ---
 
-## Tecnologías Utilizadas
+## 🏗️ Arquitectura y Tecnologías
 
-- **Kotlin**
-- **Jetpack Compose**
-- **MVVM (Model-View-ViewModel)**
-- **StateFlow y ViewModel**
-- **Jetpack Navigation for Compose**
-- **Coroutines de Kotlin**
+### Patrón de Arquitectura
+```
+📱 UI Layer (Jetpack Compose)
+    ↕️
+🎯 ViewModel Layer (StateFlow)
+    ↕️
+📦 Repository Layer
+    ↕️
+🗄️ Data Layer (Room + Retrofit)
+```
+
+### Tecnologías Principales
+
+#### Frontend
+- **Jetpack Compose** - UI moderna y declarativa
+- **Material Design 3** - Componentes y tema
+- **Navigation Compose** - Navegación entre pantallas
+- **Coil** - Carga de imágenes
+- **Lottie** - Animaciones vectoriales
+
+#### Backend & Persistencia
+- **Room Database** - Base de datos local SQLite
+  - Entidades: Product, User, Tienda, Tip, Category, Notificacion
+  - DAOs con operaciones CRUD
+  - TypeConverters para tipos complejos
+  - Flow para reactividad
+  
+- **Retrofit** - Cliente HTTP para API REST
+  - Integración con backend propio
+  - Serialización con Gson
+  - Interceptors para headers
+  
+- **DataStore** - Almacenamiento de preferencias
+  - Manejo de sesión de usuario
+  - Configuraciones de la app
+
+#### Integración de Pagos
+- **MercadoPago SDK**
+  - Checkout integrado
+  - Procesamiento de pagos
+  - Custom Tabs para flow de pago
+  - Deep Links para callbacks
+
+#### Mapas
+- **OSMDroid** - Mapas OpenStreetMap
+  - Visualización de ubicaciones
+  - Marcadores personalizados
+  - Controles de zoom y navegación
+
+#### Testing
+- **JUnit 5** - Testing unitario
+- **Kotest** - Assertions y testing
+- **MockK** - Mocking de dependencias
+- **Coroutines Test** - Testing de coroutines
+- **Compose UI Test** - Testing de UI
+
+#### Arquitectura y Patrones
+- **MVVM** - Model-View-ViewModel
+- **Repository Pattern** - Abstracción de fuentes de datos
+- **Dependency Injection Manual** - Inyección de dependencias
+- **StateFlow & Flow** - Programación reactiva
+- **Coroutines** - Operaciones asíncronas
+- **Single Source of Truth** - Room como fuente única
 
 ---
 
-## Pasos para Ejecutar el Proyecto
+## 📦 Estructura del Proyecto
+
+```
+app/src/main/java/com/example/huertohogar/
+├── data/
+│   ├── local/              # Room Database
+│   │   ├── AppDatabase.kt
+│   │   ├── ProductDao.kt
+│   │   ├── UsuarioDao.kt
+│   │   ├── TiendaDao.kt
+│   │   ├── CategoryDao.kt
+│   │   └── TipDao.kt
+│   └── repository/         # Repositorios
+│       ├── ProductRepository.kt
+│       ├── UsuarioRepository.kt
+│       └── CategoryRepository.kt
+├── model/                  # Modelos de datos
+│   ├── Product.kt
+│   ├── User.kt
+│   ├── CartItem.kt
+│   ├── Tienda.kt
+│   ├── Notificacion.kt
+│   └── ...
+├── network/                # API y Retrofit
+│   ├── ApiService.kt
+│   ├── ApiCliente.kt
+│   ├── RetrofitInstance.kt
+│   └── MercadoPagoApi.kt
+├── view/
+│   ├── screen/             # Pantallas
+│   │   ├── MainContent.kt
+│   │   ├── ProductByCategoryScreen.kt
+│   │   ├── CartScreen.kt
+│   │   ├── ProfileScreen.kt
+│   │   ├── MapScreen.kt
+│   │   └── NotificacionesScreen.kt
+│   └── components/         # Componentes reutilizables
+│       ├── ProductCard.kt
+│       ├── CategoryCard.kt
+│       ├── WelcomeCard.kt
+│       └── ...
+├── viewmodel/              # ViewModels
+│   ├── ProductViewModel.kt
+│   ├── CartViewModel.kt
+│   ├── UserViewModel.kt
+│   ├── MainViewModel.kt
+│   ├── StoreViewModel.kt
+│   └── NotificacionesViewModel.kt
+├── ui/theme/               # Tema de la app
+│   ├── Color.kt
+│   ├── Theme.kt
+│   └── Type.kt
+└── MainActivity.kt         # Actividad principal
+```
+
+---
+
+## 🚀 Pasos para Ejecutar el Proyecto
+
+### Requisitos Previos
+- **Android Studio** Hedgehog (2023.1.1) o superior
+- **JDK 11** o superior
+- **Gradle 8.13**
+- **Android SDK** (API 24-36)
+- Dispositivo físico o emulador Android
+
+### Instalación
 
 1. **Clonar el Repositorio**
    ```bash
    git clone https://github.com/ren-ortega4/HuertoHogar.git
-   
-2. **Abrir Android Studio**
-   **Selecciona File > Open y navega hasta la carpeta donde clonaste el proyecto.**
-   **Android Studio detectará la configuración de Gradle y sincronizará el proyecto automáticamente.**
+   cd HuertoHogar
+   ```
 
-3. **Añadir Recursos Faltantes**
-   **Este proyecto utiliza imágenes personalizadas para los fondos y el logotipo. Asegúrate de que los siguientes archivos estén en la carpeta app/src/main/res/drawable/**
+2. **Abrir en Android Studio**
+   - Selecciona `File > Open`
+   - Navega hasta la carpeta del proyecto
+   - Android Studio sincronizará Gradle automáticamente
 
-4. **Ejecutar la Aplicación**
-   **Seleccionar un emulador o conectar dispositivo físico, luego oprimir botón Run 'App'**
+3. **Configurar Variables de Entorno**
+   - Asegúrate de tener configurado el SDK de Android
+   - Verifica que las dependencias de Gradle se descarguen correctamente
+
+4. **Compilar el Proyecto**
+   ```bash
+   ./gradlew clean build
+   ```
+
+5. **Ejecutar la Aplicación**
+   - Selecciona un emulador o conecta un dispositivo físico
+   - Presiona el botón **Run** (▶️) o usa:
+   ```bash
+   ./gradlew installDebug
+   ```
+
+### Recursos Necesarios
+El proyecto incluye todos los recursos necesarios en `app/src/main/res/drawable/`:
+- Imágenes de productos (PNG)
+- Fondos para modo claro y oscuro
+- Iconos de categorías
+- Logotipo de la aplicación
+
+---
+
+## 🧪 Testing
+
+El proyecto incluye tests unitarios y de integración:
+
+```bash
+# Ejecutar tests unitarios
+./gradlew test
+
+# Ejecutar tests instrumentados
+./gradlew connectedAndroidTest
+```
+
+### Cobertura de Tests
+- ✅ ViewModels (CartViewModel, ProductViewModel)
+- ✅ Modelos de datos
+- ✅ Componentes de UI
+- ✅ Flujos de navegación
+
+---
+
+## 📱 Pantallas de la Aplicación
+
+1. **Splash Screen** - Animación de bienvenida con Lottie
+2. **Login** - Inicio de sesión de usuarios
+3. **Registro** - Formulario completo de registro
+4. **Home** - Pantalla principal con productos destacados y categorías
+5. **Tienda** - Catálogo completo de productos por categoría
+6. **Carrito** - Gestión del carrito de compras
+7. **Perfil** - Información del usuario
+8. **Mapa** - Ubicación de tiendas físicas
+9. **Notificaciones** - Centro de notificaciones
+
+---
+
+## 🔄 Flujo de Datos
+
+### Productos
+```
+Room DB → ProductRepository → ProductViewModel → UI (StateFlow)
+```
+
+### Autenticación
+```
+API REST → UsuarioRepository → UserViewModel → UI (StateFlow)
+```
+
+### Carrito
+```
+CartViewModel (in-memory) → UI (StateFlow) → MercadoPago API
+```
+
+---
+
+## 📝 Dependencias Principales
+
+```gradle
+// Jetpack Compose
+implementation("androidx.compose.material3:material3:1.2.0")
+implementation("androidx.navigation:navigation-compose:2.6.0")
+
+// Room Database
+implementation("androidx.room:room-runtime:2.6.1")
+implementation("androidx.room:room-ktx:2.6.1")
+kapt("androidx.room:room-compiler:2.6.1")
+
+// Retrofit
+implementation("com.squareup.retrofit2:retrofit:2.9.0")
+implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+// MercadoPago
+implementation("com.mercadopago.android.px:checkout:4.53.2")
+
+// Coroutines
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+// Coil (imágenes)
+implementation("io.coil-kt:coil-compose:2.5.0")
+
+// Lottie (animaciones)
+implementation("com.airbnb.android:lottie-compose:6.1.0")
+
+// OSMDroid (mapas)
+implementation("org.osmdroid:osmdroid-android:6.1.18")
+```
+
+---
+
+## 🎯 Características Técnicas Destacadas
+
+### Reactividad
+- Uso extensivo de `StateFlow` para UI reactiva
+- Actualización automática de la interfaz ante cambios de datos
+- Flow para operaciones asíncronas de Room
+
+### Persistencia Multi-capa
+- **Room Database**: Productos, usuarios, tiendas, tips
+- **DataStore**: Sesión de usuario y preferencias
+- **In-Memory**: Carrito de compras (durante la sesión)
+
+### Arquitectura Limpia
+- Separación clara de capas (UI, ViewModel, Repository, Data)
+- Single Source of Truth con Room
+- Inyección de dependencias manual con factories
+
+### Manejo de Estados
+- Estados de carga, éxito y error
+- Validación de formularios en tiempo real
+- Feedback visual al usuario
+
+---
+
+## 🔮 Futuras Mejoras
+
+- [ ] Implementar filtros avanzados de productos (precio, disponibilidad)
+- [ ] Agregar sistema de favoritos
+- [ ] Implementar historial de compras
+- [ ] Notificaciones push
+- [ ] Soporte para múltiples idiomas
+- [ ] Sincronización offline-first
+- [ ] Integración con más métodos de pago
+- [ ] Sistema de reseñas y calificaciones
+
+---
+
+## 📄 Licencia
+
+Este proyecto es parte de un trabajo académico para DuocUC.
+
+---
+
+## 📞 Contacto
+
+Para consultas sobre el proyecto, contacta a los autores a través del repositorio de GitHub.
+
+---
+
+**Desarrollado con ❤️ usando Jetpack Compose, Room Database y arquitectura MVVM**
