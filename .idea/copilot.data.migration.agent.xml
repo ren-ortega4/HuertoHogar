@@ -61,6 +61,10 @@
               <option value="4fa36ef6-db6c-40dc-931f-8ccb93525abb" />
               <option value="43e2d6d7-9c1e-4085-a947-572f0eda6cf7" />
               <option value="6dbf605a-79b5-4d58-8570-24ed356f58b1" />
+              <option value="dae1786e-1375-46c8-8676-ed888c901911" />
+              <option value="58d18e43-e1bf-4160-9f64-57db4966670e" />
+              <option value="f4eda94d-0336-40b9-b6f0-2223b54d02e5" />
+              <option value="bb64529f-36ee-4e7f-be7a-7d4153ab41f8" />
             </set>
           </value>
         </entry>
@@ -73,6 +77,8 @@
           <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/viewModel/StoreViewModelFactoryTest.kt" />
           <option value="file://$PROJECT_DIR$/app/build.gradle.kts" />
           <option value="file://$PROJECT_DIR$/app/src/main/java/com/example/huertohogar/viewmodel/StoreViewModel.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/network/ApiServiceTest.kt" />
+          <option value="file://$PROJECT_DIR$/app/src/test/java/com/example/huertohogar/network/MercadoPagoApiTest.kt" />
         </set>
       </entry>
     </pendingWorkingSetItems>

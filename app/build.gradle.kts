@@ -18,7 +18,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -46,6 +50,27 @@ kapt {
 }
 
 dependencies {
+
+    //Kotest
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+
+    //JUnit 5
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+
+    //MockK
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    //Coroutines Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    //Compose UI Test
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
+    //AndroiX
+    // AndroidX Test
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -85,4 +110,10 @@ dependencies {
     implementation("androidx.browser:browser:1.4.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.auth0.android:jwtdecode:2.0.2")
+
+    //Obligatorio para usar JUnit 5
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+    }
+
 }

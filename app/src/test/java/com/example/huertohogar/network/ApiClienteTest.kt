@@ -1,7 +1,7 @@
 package com.example.huertohogar.network
 
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.*
 
 class ApiClienteTest {
 
