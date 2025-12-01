@@ -289,6 +289,56 @@ app/src/main/java/com/example/huertohogar/
 
 ---
 
+## 🌐 Endpoints y APIs Utilizadas
+
+### APIs Propias (Backend Microservicios)
+
+**Base URL**: `http://tu-servidor.com/api` (Configurar según tu backend)
+
+#### Autenticación
+- **POST** `/usuarios/registro` - Registro de nuevos usuarios
+  ```json
+  {
+    "nombre": "string",
+    "correo": "string",
+    "contrasena": "string",
+    "telefono": "string",
+    "direccion": "string"
+  }
+  ```
+  
+- **POST** `/usuarios/login` - Inicio de sesión
+  ```json
+  {
+    "correo": "string",
+    "contrasena": "string"
+  }
+  ```
+  **Response**: `{ "token": "JWT_TOKEN", "usuario": {...} }`
+
+- **GET** `/usuarios/{id}` - Obtener datos del usuario
+  **Headers**: `Authorization: Bearer {token}`
+
+
+### APIs Externas
+
+#### MercadoPago Payment API
+- **Base URL**: `https://api.mercadopago.com`
+- **Endpoint**: `POST /checkout/preferences`
+  - Crear preferencia de pago para checkout
+  - Requiere Access Token de MercadoPago
+  
+**Documentación**: [MercadoPago Developers](https://www.mercadopago.com.ar/developers)
+
+**Configuración requerida**:
+```kotlin
+// En tu archivo de configuración local
+MERCADOPAGO_PUBLIC_KEY=TEST-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+MERCADOPAGO_ACCESS_TOKEN=TEST-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+---
+
 ## 🚀 Pasos para Ejecutar el Proyecto
 
 ### Requisitos Previos
@@ -333,6 +383,59 @@ El proyecto incluye todos los recursos necesarios en `app/src/main/res/drawable/
 - Fondos para modo claro y oscuro
 - Iconos de categorías
 - Logotipo de la aplicación
+
+---
+
+## 📦 APK Firmada y Distribución
+
+### Generación de APK Firmada
+
+El proyecto está configurado para generar APKs firmadas para distribución:
+
+**Ubicación del Keystore**:
+```
+📁 HuertoHogar/
+  ├── huertohogar-release-key.jks  ⚠️ (NO incluido en Git por seguridad)
+  └── keystore.properties          ⚠️ (NO incluido en Git)
+```
+
+### Instrucciones para Firmar la APK
+
+1. **Generar el Keystore** (primera vez):
+   ```bash
+   keytool -genkeypair -v -keystore huertohogar-release-key.jks \
+     -keyalg RSA -keysize 2048 -validity 10000 -alias huertohogar
+   ```
+
+2. **Configurar credenciales** en `keystore.properties`:
+   ```properties
+   storePassword=TU_PASSWORD_KEYSTORE
+   keyPassword=TU_PASSWORD_KEY
+   keyAlias=huertohogar
+   storeFile=huertohogar-release-key.jks
+   ```
+
+3. **Compilar APK Release firmada**:
+   ```bash
+   ./gradlew assembleRelease
+   ```
+
+4. **Ubicación de la APK generada**:
+   ```
+   app/build/outputs/apk/release/app-release.apk
+   ```
+
+5. **Generar Bundle para Google Play** (recomendado):
+   ```bash
+   ./gradlew bundleRelease
+   ```
+   Ubicación: `app/build/outputs/bundle/release/app-release.aab`
+
+### ⚠️ Seguridad del Keystore
+- El archivo `.jks` y `keystore.properties` están en `.gitignore`
+- **NUNCA** subir el keystore al repositorio público
+- Guardar backup del keystore en ubicación segura
+- Sin el keystore original, no se pueden publicar actualizaciones
 
 ---
 
@@ -460,16 +563,96 @@ implementation("org.osmdroid:osmdroid-android:6.1.18")
 
 ---
 
+## 🔗 Código Fuente
+
+### Repositorio Principal
+```
+https://github.com/ren-ortega4/HuertoHogar
+```
+
+### Estructura de Repositorios
+
+#### App Móvil (Android)
+- **Repositorio**: `ren-ortega4/HuertoHogar` (este repositorio)
+- **Tecnología**: Kotlin + Jetpack Compose
+- **Ubicación del código fuente**: `/app/src/main/java/com/example/huertohogar/`
+
+#### Microservicios Backend
+Para el backend de la aplicación, se utilizan los siguientes microservicios:
+
+1. **Servicio de Autenticación** (Usuarios)
+   - Gestión de registro y login
+   - Autenticación JWT
+   - Gestión de perfiles
+
+2. **Servicio de Productos**
+   - CRUD de productos
+   - Categorización
+   - Búsqueda y filtros
+
+3. **Servicio de Tiendas**
+   - Gestión de ubicaciones
+   - Información de tiendas físicas
+
+**Nota**: Los microservicios pueden estar en repositorios separados o en el mismo repositorio en carpetas diferentes según la arquitectura elegida.
+
+---
+
+## 👨‍💻 Evidencia de Trabajo Colaborativo
+
+### Estadísticas del Repositorio
+
+Este proyecto fue desarrollado de forma colaborativa por el equipo. Puedes ver la evidencia del trabajo en equipo en:
+
+**Historial de Commits por Autor**:
+```bash
+git log --format='%aN' | sort -u
+git shortlog -s -n --all
+```
+
+
+### Ver Commits por Persona
+```bash
+# Ver commits de un autor específico
+git log --author="Angel Prado" --oneline
+git log --author="Danilo Quiroz" --oneline
+git log --author="Renato Ortega" --oneline
+```
+
+### Branches y Pull Requests
+El desarrollo se realizó utilizando:
+- Branch principal: `master`
+- Branches de feature para cada funcionalidad
+- Pull Requests para revisión de código
+- Code reviews entre los miembros del equipo
+
+**Evidencia visual**: Ver el gráfico de contribuciones en GitHub:
+```
+https://github.com/ren-ortega4/HuertoHogar/graphs/contributors
+```
+
+---
+
 ## 📄 Licencia
 
-Este proyecto es parte de un trabajo académico para DuocUC.
+Este proyecto es parte de un trabajo académico para **DuocUC** - Desarrollo de Aplicaciones Móviles.
 
 ---
 
 ## 📞 Contacto
 
-Para consultas sobre el proyecto, contacta a los autores a través del repositorio de GitHub.
+Para consultas sobre el proyecto:
+
+- **Repositorio**: [github.com/ren-ortega4/HuertoHogar](https://github.com/ren-ortega4/HuertoHogar)
+- **Issues**: [github.com/ren-ortega4/HuertoHogar/issues](https://github.com/ren-ortega4/HuertoHogar/issues)
 
 ---
 
 **Desarrollado con ❤️ usando Jetpack Compose, Room Database y arquitectura MVVM**
+
+### 📊 Estadísticas del Proyecto
+- **Lenguaje**: Kotlin 100%
+- **Líneas de código**: ~8,000+
+- **Pantallas**: 9 principales
+- **Tests**: Unitarios + Instrumentados
+- **Arquitectura**: MVVM + Clean Architecture
